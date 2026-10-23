@@ -14,7 +14,7 @@
   --card-foreground: #15161c;
   --muted: #f3f4f8;
   --muted-foreground: #646a7c;
-  --subtle: #8a8fa0;
+  --subtle: #696e80;
   --border: #e5e7ee;
   --input: #dcdfe8;
   --ring: #8d8df0;
@@ -25,9 +25,9 @@
   --accent-foreground: #3d3db0;
   --sidebar: #f6f7fa;
   --sidebar-border: #e8eaf0;
-  --success: #15803d;
+  --success: #127536;
   --success-soft: #e8f6ec;
-  --warning: #b45309;
+  --warning: #a94e08;
   --warning-soft: #fdf3e2;
   --danger: #c2272d;
   --danger-soft: #fdecec;
@@ -50,7 +50,7 @@
   --card-foreground: #ececf2;
   --muted: #1b1c24;
   --muted-foreground: #9a9db0;
-  --subtle: #747889;
+  --subtle: #8b8fa1;
   --border: #252733;
   --input: #2d2f3d;
   --ring: #6f6fe0;
