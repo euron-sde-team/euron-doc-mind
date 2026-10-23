@@ -6,3 +6,5 @@ pnpm-lock.yaml
 apps/api/
 docs/api/openapi.json
 samples/
+# Prose and READMEs are wrapped by hand; their HTML blocks must stay exactly as written.
+*.md
