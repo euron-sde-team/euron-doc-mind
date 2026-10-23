@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/*
+ * DocMind design tokens. Every colour in the app comes from these variables, so a theme or a
+ * brand change is one edit here. Light is the default; `.dark` on <html> switches the palette
+ * (set before first paint by the inline script in the root layout, so there is no flash).
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #fbfbfd;
+  --foreground: #15161c;
+  --card: #ffffff;
+  --card-foreground: #15161c;
+  --muted: #f3f4f8;
+  --muted-foreground: #646a7c;
+  --subtle: #8a8fa0;
+  --border: #e5e7ee;
+  --input: #dcdfe8;
+  --ring: #8d8df0;
+  --primary: #5b5bd6;
+  --primary-hover: #4c4cc4;
+  --primary-foreground: #ffffff;
+  --accent: #efefff;
+  --accent-foreground: #3d3db0;
+  --sidebar: #f6f7fa;
+  --sidebar-border: #e8eaf0;
+  --success: #15803d;
+  --success-soft: #e8f6ec;
+  --warning: #b45309;
+  --warning-soft: #fdf3e2;
+  --danger: #c2272d;
+  --danger-soft: #fdecec;
+  --highlight: #fff1b8;
+  --highlight-strong: #ffd84d;
+  --chart-1: #5b5bd6;
+  --chart-2: #b7b8f2;
+  --chart-3: #22a06b;
+  --shadow-sm: 0 1px 2px rgb(16 18 27 / 0.06);
+  --shadow-md: 0 8px 24px -8px rgb(16 18 27 / 0.16), 0 2px 6px rgb(16 18 27 / 0.06);
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0d0e12;
+  --foreground: #ececf2;
+  --card: #14151b;
+  --card-foreground: #ececf2;
+  --muted: #1b1c24;
+  --muted-foreground: #9a9db0;
+  --subtle: #747889;
+  --border: #252733;
+  --input: #2d2f3d;
+  --ring: #6f6fe0;
+  --primary: #7b7bf0;
+  --primary-hover: #8d8df4;
+  --primary-foreground: #0d0e12;
+  --accent: #1f2046;
+  --accent-foreground: #c7c8ff;
+  --sidebar: #111217;
+  --sidebar-border: #1f2029;
+  --success: #4ade80;
+  --success-soft: #12261a;
+  --warning: #fbbf24;
+  --warning-soft: #2a2010;
+  --danger: #f87171;
+  --danger-soft: #2c1414;
+  --highlight: #4a3f0f;
+  --highlight-strong: #6b5a12;
+  --chart-1: #7b7bf0;
+  --chart-2: #3a3b78;
+  --chart-3: #34d399;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 12px 32px -12px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.4);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle: var(--subtle);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-highlight: var(--highlight);
+  --color-highlight-strong: var(--highlight-strong);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --animate-pulse-dot: pulse-dot 1.4s ease-in-out infinite;
+  --animate-fade-in: fade-in 160ms cubic-bezier(0.2, 0, 0, 1);
+
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 22%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Thin, quiet scrollbars that match the palette. */
+.scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: var(--input) transparent;
+}
