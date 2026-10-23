@@ -55,9 +55,13 @@ _HYDRATE = text(
     "FROM chunks c JOIN documents d ON d.id = c.document_id "
     "WHERE c.workspace_id = :workspace_id AND c.id = ANY(:ids)"
 )
+# Two candidate snippets per passage: one around all the query words together, one around
+# any of them. The first is better when it exists ("parental leave", not just "leave").
 _HEADLINES = text(
-    "SELECT c.id, ts_headline('english', c.text, to_tsquery('english', :query), :options) "
-    "AS snippet FROM chunks c WHERE c.workspace_id = :workspace_id AND c.id = ANY(:ids)"
+    "SELECT c.id, "
+    "ts_headline('english', c.text, to_tsquery('english', :every), :options) AS every_word, "
+    "ts_headline('english', c.text, to_tsquery('english', :any), :options) AS any_word "
+    "FROM chunks c WHERE c.workspace_id = :workspace_id AND c.id = ANY(:ids)"
 )
 
 
@@ -76,14 +80,22 @@ class ChunkRow:
     embedding: Any
 
 
+def _terms(question: str) -> list[str]:
+    return [t for t in dict.fromkeys(content_terms(question)) if _SAFE_TERM.match(t)][:24]
+
+
 def keyword_query(question: str) -> str | None:
     """An OR query over the question's content words, ranked by cover density.
 
     `websearch_to_tsquery` would AND every word, which is right for a search box and wrong
     for a natural-language question where most words are not in the passage.
     """
-    terms = [t for t in dict.fromkeys(content_terms(question)) if _SAFE_TERM.match(t)]
-    return " | ".join(terms[:24]) or None
+    return " | ".join(_terms(question)) or None
+
+
+def all_words_query(question: str) -> str | None:
+    """The same words joined with AND, for snippets that show them together."""
+    return " & ".join(_terms(question)) or None
 
 
 def _scope(document_ids: Sequence[uuid.UUID] | None) -> list[uuid.UUID] | None:
@@ -164,21 +176,22 @@ class SearchRepository(Repository):
     async def headlines(
         self, workspace_id: uuid.UUID, question: str, ids: Sequence[uuid.UUID]
     ) -> dict[uuid.UUID, str]:
-        query = keyword_query(question)
-        if query is None or not ids:
+        any_word, every_word = keyword_query(question), all_words_query(question)
+        if any_word is None or every_word is None or not ids:
             return {}
         rows = (
             await self.session.execute(
                 _HEADLINES,
                 {
-                    "query": query,
+                    "every": every_word,
+                    "any": any_word,
                     "options": _HEADLINE_OPTIONS,
                     "workspace_id": workspace_id,
                     "ids": list(ids),
                 },
             )
         ).all()
-        return {r.id: r.snippet for r in rows}
+        return {r.id: r.every_word if HIGHLIGHT_START in r.every_word else r.any_word for r in rows}
 
 
 def _as_array(value: Any) -> np.ndarray:
