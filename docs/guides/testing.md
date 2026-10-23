@@ -28,7 +28,7 @@ make test        # pytest tests/unit, then Vitest for the web app
 
 No database, no network, no model download (tests that need embeddings use the
 deterministic hash embedder, and provider tests mock HTTP). API unit tests live in
-`apps/api/tests/unit` (111 tests):
+`apps/api/tests/unit` (112 tests):
 
 | Suite | Tests | Covers |
 | --- | --- | --- |

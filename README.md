@@ -136,7 +136,7 @@ reads every common office format and shows its sources for every claim.
 | **Answers** | Offline extractive answerer by default; Ollama or any OpenAI-compatible API as an option; streamed with citations |
 | **Caching** | Exact and semantic answer cache keyed by the library version, plus an embedding cache |
 | **Infrastructure** | 12 Terraform modules, 3 environments (local emulator, AWS dev, AWS prod) |
-| **Tests** | 134 unit (111 API, 23 web), 41 integration, 14 browser end-to-end, plus a QA crawl of every page at two widths |
+| **Tests** | 135 unit (112 API, 23 web), 41 integration, 14 browser end-to-end, plus a QA crawl of every page at two widths |
 | **License** | MIT |
 
 ## 🖼️ Screenshots
@@ -436,7 +436,7 @@ Report vulnerabilities privately: see [SECURITY.md](SECURITY.md).
 
 | Suite | What it proves | Run |
 | --- | --- | --- |
-| Unit (134) | Parsers, chunker, retrieval maths, the extractive answerer, citations, prompts, config guards, security, frontend logic | `make test` |
+| Unit (135) | Parsers, chunker, retrieval maths, the extractive answerer, citations, prompts, config guards, security, frontend logic | `make test` |
 | Integration (41) | The real API against Postgres with pgvector, Valkey and the AWS emulator: grounded answers, both cache levels, the library, an isolation sweep, roles, keys, sessions, the SQS worker, migrations | `make test-integration` |
 | Browser (14) | Sign-in, cited answers and the viewer, follow-ups, uploads, search, insights, members and API keys | `make e2e` |
 | QA crawl | Every page at desktop and mobile widths: no console errors, failed requests, broken links or serious accessibility violations | `make qa` |
