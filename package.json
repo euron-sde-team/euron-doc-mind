@@ -11,11 +11,13 @@
     "dev": "pnpm --filter @docmind/web dev",
     "lint": "pnpm -r --parallel lint",
     "typecheck": "pnpm -r --parallel typecheck",
-    "test": "pnpm -r test",
+    "test": "pnpm --filter @docmind/web test",
     "build": "pnpm --filter @docmind/web build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "e2e": "pnpm --filter @docmind/e2e test"
+    "e2e": "pnpm --filter @docmind/e2e test",
+    "qa": "pnpm --filter @docmind/e2e qa",
+    "capture": "pnpm --filter @docmind/e2e capture"
   },
   "devDependencies": {
     "prettier": "3.9.10",
