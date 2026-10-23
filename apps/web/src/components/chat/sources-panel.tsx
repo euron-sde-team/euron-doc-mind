@@ -31,8 +31,9 @@ export function SourcesPanel({
             key={source.chunk_id}
             href={viewerHref(workspace, source)}
             className={cn(
-              "group rounded-lg border border-border bg-card px-3 py-2 transition-colors hover:border-primary/40 hover:bg-accent/40",
-              !cited.has(source.n) && "opacity-75",
+              "group rounded-lg border px-3 py-2 transition-colors hover:border-primary/40 hover:bg-accent/40",
+              // Retrieved but not cited: a quieter surface, never lower text contrast.
+              cited.has(source.n) ? "border-border bg-card" : "border-dashed border-border bg-muted/40",
             )}
           >
             <span className="flex items-center gap-1.5 text-[12px] font-medium">
