@@ -43,3 +43,20 @@ def test_best_quote_picks_the_matching_list_item_not_the_whole_list() -> None:
     quote = best_quote("The top 5 customers are 38 percent of revenue", passage)
 
     assert quote == "Customer concentration: the top 5 customers are 38 percent of revenue"
+
+
+def test_each_list_item_quotes_its_own_line_of_the_source() -> None:
+    passage = (
+        "Key risks\n\n\N{BULLET} LiDAR supply: a single supplier provides all sensors\n\n"
+        "\N{BULLET} Customer concentration: the top 5 customers are 38 percent of revenue"
+    )
+    answer = (
+        "- LiDAR supply: a single supplier provides all sensors. [1]\n"
+        "- Customer concentration: the top 5 customers are 38 percent of revenue. [1]"
+    )
+
+    _, citations = extract_citations(answer, [source(passage, n=1)])
+
+    assert [c["quote"] for c in citations] == [
+        "LiDAR supply: a single supplier provides all sensors"
+    ]

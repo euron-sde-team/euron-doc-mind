@@ -14,6 +14,7 @@ from docmind.ai.sources import Source
 from docmind.core.text import content_terms, split_sentences, truncate
 
 _MARKER = re.compile(r"\s?\[(\d{1,2}(?:\s*[,;]\s*\d{1,2})*)\]")
+_LEADING_MARKERS = re.compile(r"^(?:\s*\[\d{1,2}(?:\s*[,;]\s*\d{1,2})*\])+")
 # Blocks (paragraphs, list items) come before sentences: list items rarely end with a full
 # stop, so splitting a slide or a list by sentence alone would quote the whole list.
 _BLOCK = re.compile(r"\n\s*\n|\n(?=\s*[\N{BULLET}*-]\s)")
@@ -39,10 +40,22 @@ def extract_citations(answer: str, sources: list[Source]) -> tuple[str, list[dic
         return "".join(f" [{n}]" for n in dict.fromkeys(valid))
 
     cleaned = _MARKER.sub(keep_valid, answer).strip()
-    for sentence in split_sentences(cleaned) or [cleaned]:
-        for match in _MARKER.finditer(sentence):
-            for n in _numbers(match.group(1)):
-                claims.setdefault(n, _MARKER.sub("", sentence))
+    for line in cleaned.split("\n"):
+        previous = ""
+        for sentence in split_sentences(line) or [line]:
+            # "...by Q1 2027. [1]" splits after the full stop, so a marker that opens a
+            # sentence belongs to the one before it.
+            lead = _LEADING_MARKERS.match(sentence)
+            if lead and previous:
+                for match in _MARKER.finditer(lead.group()):
+                    for n in _numbers(match.group(1)):
+                        claims.setdefault(n, previous)
+                sentence = sentence[lead.end() :]
+            text = _MARKER.sub("", sentence).strip().lstrip("\N{BULLET}*- ").strip()
+            for match in _MARKER.finditer(sentence):
+                for n in _numbers(match.group(1)):
+                    claims.setdefault(n, text)
+            previous = text or previous
 
     citations = []
     for n in sorted(claims):
