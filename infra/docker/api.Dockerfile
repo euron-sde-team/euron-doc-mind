@@ -37,6 +37,10 @@ FROM ${PYTHON_IMAGE} AS runtime
 ENV PATH=/app/.venv/bin:$PATH PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 TZ=UTC \
     EMBEDDINGS_CACHE_DIR=/app/models/fastembed TIKTOKEN_CACHE_DIR=/app/models/tiktoken \
     HF_HUB_OFFLINE=1 STORAGE_DIR=/tmp/docmind/files
+# Only these peers may set the client address through X-Forwarded-For (uvicorn reads this
+# variable). The AWS deployment lists the VPC range, so the address the load balancer
+# appends is used and anything a client prepends is ignored.
+ENV FORWARDED_ALLOW_IPS=127.0.0.1
 # tini forwards SIGTERM so uvicorn drains requests and the worker finishes its documents.
 RUN apt-get update && apt-get install -y --no-install-recommends tini ca-certificates libgomp1 \
  && rm -rf /var/lib/apt/lists/* \
@@ -52,5 +56,4 @@ HEALTHCHECK --interval=15s --timeout=3s --start-period=30s --retries=3 \
   CMD ["python", "-c", "import sys, urllib.request; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/livez', timeout=2).status == 200 else 1)"]
 ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["uvicorn", "docmind.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8080", \
-     "--proxy-headers", "--forwarded-allow-ips", "*", "--timeout-graceful-shutdown", "20", \
-     "--no-access-log"]
+     "--proxy-headers", "--timeout-graceful-shutdown", "20", "--no-access-log"]
