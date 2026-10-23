@@ -9,6 +9,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from docmind.ai.sources import Source
 from docmind.models import UsageEvent, Workspace
 from docmind.models.enums import CacheResult, UsageKind
 from docmind.repositories.usage import UsageRepository
@@ -16,6 +17,24 @@ from docmind.services.chat import ChatService
 from docmind.services.container import Container
 from docmind.services.principal import Principal
 from docmind.services.retrieval import RetrievalService
+
+# A passage found by meaning alone is kept only when it is about as close to the query as
+# the best match. Embeddings always return a nearest neighbour, even for unrelated text, and
+# a search box should not pad its results with passages that merely share a domain.
+MEANING_ONLY_MARGIN = 0.1
+
+
+def relevant(sources: Sequence[Source]) -> list[Source]:
+    """Keyword matches, plus meaning-only matches within the margin of the best one."""
+    scores = [s.vector_score for s in sources if s.vector_score is not None]
+    if not scores:
+        return list(sources)
+    floor = max(scores) - MEANING_ONLY_MARGIN
+    return [
+        s
+        for s in sources
+        if s.keyword_score is not None or (s.vector_score is not None and s.vector_score >= floor)
+    ]
 
 
 class SearchService:
@@ -37,7 +56,7 @@ class SearchService:
         sources, _ = await retrieval.candidates(
             workspace.id, query, scope, limit=max(limit * 2, 20)
         )
-        sources = sources[:limit]
+        sources = relevant(sources)[:limit]
         snippets = await retrieval.headlines(workspace.id, query, [s.chunk_id for s in sources])
         hits = [
             {
