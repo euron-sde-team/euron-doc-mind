@@ -1,0 +1,24 @@
+{
+  "name": "euron-doc-mind",
+  "private": true,
+  "description": "Euron DocMind: private, cited chat over your documents.",
+  "license": "MIT",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @docmind/web dev",
+    "lint": "pnpm -r --parallel lint",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "test": "pnpm -r test",
+    "build": "pnpm --filter @docmind/web build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "e2e": "pnpm --filter @docmind/e2e test"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10",
+    "prettier-plugin-tailwindcss": "0.8.1"
+  }
+}
