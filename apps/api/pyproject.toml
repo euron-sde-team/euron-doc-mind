@@ -112,7 +112,8 @@ testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 asyncio_default_test_loop_scope = "session"
-addopts = "-ra --strict-markers"
+# Integration tests need real services: `make test-integration` selects them with -m.
+addopts = "-ra --strict-markers -m 'not integration'"
 markers = [
   "integration: needs Postgres (pgvector), Valkey and the AWS emulator (make test-integration)",
 ]
