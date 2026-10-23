@@ -81,7 +81,7 @@ CONVERSATIONS: tuple[tuple[int, str, tuple[str, ...]], ...] = (
     (
         11,
         "Q3 board update",
-        ("What was revenue in Q3 2026?", "What are the biggest risks the board should know about?"),
+        ("What was revenue in Q3 2026?", "What decisions is the board being asked to make?"),
     ),
     (
         10,
