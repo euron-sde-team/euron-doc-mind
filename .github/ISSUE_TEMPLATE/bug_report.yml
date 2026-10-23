@@ -26,7 +26,17 @@ body:
     id: file-type
     attributes:
       label: File type involved
-      options: [Not file specific, PDF, Word (.docx), Excel (.xlsx), CSV, PowerPoint (.pptx), Text or Markdown, HTML]
+      options:
+        [
+          Not file specific,
+          PDF,
+          Word (.docx),
+          Excel (.xlsx),
+          CSV,
+          PowerPoint (.pptx),
+          Text or Markdown,
+          HTML,
+        ]
   - type: dropdown
     id: env
     attributes:
