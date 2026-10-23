@@ -1,0 +1,19 @@
+NORTHWIND FLEET SOFTWARE 4.2 RELEASE NOTES
+
+Released 2026-09-21. Applies to Atlas v1 robots and to Atlas v2 pilot units.
+
+NEW
+- Multi-floor mapping: one site map can now span up to 6 floors connected by lifts.
+- Zone speed limits: site administrators can set a lower top speed for any zone, for example near packing stations.
+- Shift reports: a summary of picks, interventions and charging time is emailed after every shift.
+
+IMPROVED
+- Battery scheduling now staggers charging across the fleet, raising robot utilisation by 18 percent.
+- Relocalisation after a reset is about twice as fast.
+
+FIXED
+- Robots no longer pause at a reflective floor marking near dock doors.
+- The fleet map no longer shows a robot twice after a network reconnect.
+
+KNOWN ISSUES
+- On sites with more than 200 robots the shift report can arrive up to 30 minutes late.

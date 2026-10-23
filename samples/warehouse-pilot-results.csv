@@ -1,0 +1,7 @@
+Site,Region,Start date,Robots,Picks per hour,Pick accuracy,"Interventions per 1,000 picks",Status
+"Reno, NV",US West,2026-05-04,24,412,99.7%,1.8,Completed
+"Dallas, TX",US South,2026-05-18,18,388,99.5%,2.4,Completed
+Rotterdam,Europe,2026-06-01,30,455,99.8%,1.2,Completed
+Pune,Asia Pacific,2026-06-15,12,361,99.4%,3.1,Completed
+"Columbus, OH",US Central,2026-07-06,20,401,99.6%,2.0,In progress
+Hamburg,Europe,2026-08-10,16,377,99.5%,2.6,In progress
