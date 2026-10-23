@@ -58,7 +58,12 @@ def blocks_from_text(raw: str, *, detect_headings: bool = True) -> list[Block]:
         # directly; it can only start once that paragraph has ended.
         paragraph_done = not current or current[-1].endswith(_PARAGRAPH_END)
         numbered = bool(_SECTION_NUMBER.match(line))
-        if detect_headings and paragraph_done and index < len(lines) and (numbered or not _BULLET.match(line)):
+        if (
+            detect_headings
+            and paragraph_done
+            and index < len(lines)
+            and (numbered or not _BULLET.match(line))
+        ):
             candidate, consumed = line, index
             while (
                 candidate.split()[-1].lower() in _CONNECTORS
