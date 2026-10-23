@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-labelledby="t d">
+  <title id="t">Euron DocMind</title>
+  <desc id="d">Private, cited answers from your own documents</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d0e12"/>
+      <stop offset="1" stop-color="#141530"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7b7bf0" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#7b7bf0" stop-opacity="0.9"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity="0.035"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="320" rx="16" fill="url(#bg)"/>
+  <rect width="1280" height="320" rx="16" fill="url(#grid)"/>
+
+  <g font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+    <text x="72" y="140" fill="#f1f1fb" font-size="54" font-weight="650" letter-spacing="-1.2">Euron DocMind</text>
+    <text x="74" y="186" fill="#a3a5c2" font-size="22" font-weight="400">Private, cited answers from your own documents.</text>
+    <text x="74" y="246" font-family="JetBrains Mono, SFMono-Regular, Menlo, monospace" font-size="15" fill="#8a8daa" xml:space="preserve">hybrid retrieval<tspan fill="#3a3c5c">  /  </tspan>verified citations<tspan fill="#3a3c5c">  /  </tspan>two-level answer cache<tspan fill="#3a3c5c">  /  </tspan>runs offline</text>
+  </g>
+
+  <!-- A document with the cited passage highlighted -->
+  <g transform="translate(900 52)">
+    <rect x="0" y="0" width="210" height="216" rx="12" fill="#15161f" stroke="#7b7bf0" stroke-opacity="0.35"/>
+    <rect x="20" y="22" width="112" height="10" rx="5" fill="#3a3c5c"/>
+    <rect x="20" y="50" width="168" height="8" rx="4" fill="#262838"/>
+    <rect x="20" y="68" width="146" height="8" rx="4" fill="#262838"/>
+    <rect x="14" y="84" width="182" height="20" rx="6" fill="#5b5bd6" fill-opacity="0.3"/>
+    <rect x="20" y="90" width="158" height="8" rx="4" fill="#a9aaf7"/>
+    <rect x="20" y="114" width="162" height="8" rx="4" fill="#262838"/>
+    <rect x="20" y="132" width="128" height="8" rx="4" fill="#262838"/>
+    <rect x="20" y="160" width="96" height="10" rx="5" fill="#3a3c5c"/>
+    <rect x="20" y="182" width="170" height="8" rx="4" fill="#262838"/>
+  </g>
+
+  <!-- The answer that cites it -->
+  <g transform="translate(1004 150)">
+    <rect x="0" y="0" width="226" height="104" rx="14" fill="#1b1c33" stroke="#7b7bf0" stroke-opacity="0.6"/>
+    <rect x="18" y="22" width="160" height="9" rx="4.5" fill="#dcdcff" fill-opacity="0.85"/>
+    <rect x="18" y="41" width="122" height="9" rx="4.5" fill="#dcdcff" fill-opacity="0.55"/>
+    <rect x="148" y="36" width="30" height="20" rx="6" fill="#5b5bd6"/>
+    <text x="163" y="50" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, monospace" font-size="12" font-weight="600" fill="#ffffff">1</text>
+    <rect x="18" y="72" width="190" height="6" rx="3" fill="url(#glow)"/>
+  </g>
+  <path d="M1004 200 C 960 200 990 146 1096 146" fill="none" stroke="#7b7bf0" stroke-opacity="0.45" stroke-width="1.4" stroke-dasharray="4 5"/>
+</svg>
