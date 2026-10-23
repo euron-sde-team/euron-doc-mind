@@ -63,6 +63,7 @@ resource "aws_vpc_security_group_ingress_rule" "public" {
 }
 
 resource "aws_lb" "this" {
+  #checkov:skip=CKV2_AWS_76:The WAF below, with AWSManagedRulesKnownBadInputsRuleSet (Log4j), is attached when enable_waf is true, as in aws-prod; aws-dev runs without a WAF to save cost.
   #checkov:skip=CKV2_AWS_28:WAF is an input (enable_waf); aws-prod enables it.
   #checkov:skip=CKV_AWS_150:Deletion protection is an input (deletion_protection); aws-prod enables it.
   name                       = "${var.name_prefix}-alb"
@@ -133,7 +134,6 @@ resource "aws_wafv2_web_acl" "this" {
   dynamic "rule" {
     for_each = {
       AWSManagedRulesCommonRuleSet          = 10
-      AWSManagedRulesKnownBadInputsRuleSet  = 20
       AWSManagedRulesAmazonIpReputationList = 30
     }
     content {
@@ -163,6 +163,27 @@ resource "aws_wafv2_web_acl" "this" {
         metric_name                = rule.key
         sampled_requests_enabled   = true
       }
+    }
+  }
+
+  # Written out rather than in the map above, so policy scanners can see it: this group
+  # blocks known exploit payloads, including Log4j JNDI lookups (CVE-2021-44228).
+  rule {
+    name     = "AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 20
+    override_action {
+      none {}
+    }
+    statement {
+      managed_rule_group_statement {
+        vendor_name = "AWS"
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesKnownBadInputsRuleSet"
+      sampled_requests_enabled   = true
     }
   }
 
