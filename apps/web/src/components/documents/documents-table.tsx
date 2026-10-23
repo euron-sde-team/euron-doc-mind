@@ -22,7 +22,7 @@ export function DocumentsTable({
       <table className="w-full text-left text-[13px]">
         <thead className="border-border bg-muted/50 text-subtle border-b text-[11.5px] tracking-wider uppercase">
           <tr>
-            <th scope="col" className="px-4 py-2.5 font-medium">
+            <th scope="col" className="w-full px-4 py-2.5 font-medium md:w-[44%]">
               Document
             </th>
             <th scope="col" className="hidden px-3 py-2.5 font-medium md:table-cell">
@@ -67,7 +67,7 @@ export function DocumentsTable({
               </td>
               <td className="text-muted-foreground hidden px-3 py-2.5 whitespace-nowrap md:table-cell">
                 {document.status === "ready"
-                  ? `${formatNumber(document.section_count)} sections, ${formatNumber(document.token_count)} tokens`
+                  ? `${formatNumber(document.section_count)} ${document.section_count === 1 ? "section" : "sections"}, ${formatNumber(document.token_count)} tokens`
                   : "Not indexed yet"}
               </td>
               <td className="text-muted-foreground hidden px-3 py-2.5 whitespace-nowrap sm:table-cell">
