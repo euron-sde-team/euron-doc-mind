@@ -38,7 +38,7 @@ async def test_local_storage_round_trip(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("key", ["../etc/passwd", "/abs/path", "a/../../b", "a b"])
 async def test_local_storage_refuses_unsafe_keys(tmp_path: Path, key: str) -> None:
-    with pytest.raises(ValueError, match="unsafe|escapes"):
+    with pytest.raises(ValueError, match=r"unsafe|escapes"):
         await LocalStorage(tmp_path).put(key, b"x", "text/plain")
 
 

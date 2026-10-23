@@ -15,7 +15,12 @@ from docmind.core.config import Settings
 from docmind.core.errors import UpstreamError
 from tests.unit.helpers import source
 
-OPENAI = Settings(llm_provider="openai", llm_model="small-model", llm_base_url="https://llm.example/v1", llm_api_key="sk-test")
+OPENAI = Settings(
+    llm_provider="openai",
+    llm_model="small-model",
+    llm_base_url="https://llm.example/v1",
+    llm_api_key="sk-test",
+)
 OLLAMA = Settings(llm_provider="ollama", llm_model="qwen3:4b", ollama_url="http://ollama:11434")
 
 
@@ -47,7 +52,9 @@ async def test_openai_compatible_streaming_and_usage() -> None:
 
 @respx.mock
 async def test_provider_errors_become_upstream_errors() -> None:
-    respx.post("https://llm.example/v1/chat/completions").mock(return_value=httpx.Response(429, text="slow down"))
+    respx.post("https://llm.example/v1/chat/completions").mock(
+        return_value=httpx.Response(429, text="slow down")
+    )
     client = OpenAICompatibleClient(OPENAI)
     with pytest.raises(UpstreamError, match="429"):
         _ = [p async for p in client.stream([{"role": "user", "content": "q"}], Usage())]
@@ -60,7 +67,10 @@ async def test_ollama_streaming_reads_ndjson() -> None:
     respx.post("http://ollama:11434/api/chat").mock(return_value=httpx.Response(200, content=body))
     client = OllamaClient(OLLAMA)
     usage = Usage()
-    assert "".join([p async for p in client.stream([{"role": "user", "content": "hi"}], usage)]) == "Hello there"
+    assert (
+        "".join([p async for p in client.stream([{"role": "user", "content": "hi"}], usage)])
+        == "Hello there"
+    )
     assert (usage.prompt_tokens, usage.completion_tokens) == (30, 2)
     await client.aclose()
 
@@ -68,19 +78,32 @@ async def test_ollama_streaming_reads_ndjson() -> None:
 @respx.mock
 async def test_model_generator_counts_tokens_when_the_server_does_not() -> None:
     respx.post("https://llm.example/v1/chat/completions").mock(
-        return_value=httpx.Response(200, content=_sse('{"choices":[{"delta":{"content":"Answer [1]."}}]}', "[DONE]"))
+        return_value=httpx.Response(
+            200, content=_sse('{"choices":[{"delta":{"content":"Answer [1]."}}]}', "[DONE]")
+        )
     )
     generator = ModelGenerator(OpenAICompatibleClient(OPENAI), TokenCounter("heuristic"))
     usage = Usage()
     request = GenerationRequest("What?", [source("Some fact.", n=1)])
     assert "".join([p async for p in generator.stream(request, usage)]) == "Answer [1]."
-    assert usage.prompt_tokens > 0 and usage.completion_tokens > 0
+    assert usage.prompt_tokens > 0
+    assert usage.completion_tokens > 0
     assert generator.label == "openai:small-model"
 
 
 async def test_extractive_generator_streams_line_by_line_without_a_model() -> None:
     generator = ExtractiveGenerator()
-    sources = [source("Key risks\n\n\N{BULLET} Supply risk one here\n\n\N{BULLET} Demand risk two here", n=1)]
-    parts = [p async for p in generator.stream(GenerationRequest("What are the key risks?", sources), Usage())]
-    assert len(parts) == 2 and parts[1].startswith("\n- ")
+    sources = [
+        source(
+            "Key risks\n\n\N{BULLET} Supply risk one here\n\n\N{BULLET} Demand risk two here", n=1
+        )
+    ]
+    parts = [
+        p
+        async for p in generator.stream(
+            GenerationRequest("What are the key risks?", sources), Usage()
+        )
+    ]
+    assert len(parts) == 2
+    assert parts[1].startswith("\n- ")
     assert generator.uses_model is False

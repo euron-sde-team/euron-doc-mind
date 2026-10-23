@@ -54,7 +54,9 @@ def test_sessions_reject_tampering_expiry_and_foreign_audiences() -> None:
     expired, _ = issue_session(uuid.uuid4(), 1, secret=SECRET, ttl=timedelta(seconds=-5))
     with pytest.raises(UnauthorizedError):
         decode_session(expired, secret=SECRET)
-    foreign = jwt.encode({"sub": str(uuid.uuid4()), "aud": "other", "iss": "docmind"}, SECRET, algorithm="HS256")
+    foreign = jwt.encode(
+        {"sub": str(uuid.uuid4()), "aud": "other", "iss": "docmind"}, SECRET, algorithm="HS256"
+    )
     with pytest.raises(UnauthorizedError):
         decode_session(foreign, secret=SECRET)
 
@@ -62,7 +64,8 @@ def test_sessions_reject_tampering_expiry_and_foreign_audiences() -> None:
 def test_api_keys_are_parsed_and_verified_with_the_pepper() -> None:
     key = generate_api_key("pepper-one")
     parsed = parse_api_key(key.plaintext)
-    assert parsed is not None and parsed[0] == key.prefix
+    assert parsed is not None
+    assert parsed[0] == key.prefix
     assert verify_api_key_secret(parsed[1], key.secret_hash, "pepper-one")
     assert not verify_api_key_secret(parsed[1], key.secret_hash, "pepper-two")
     assert parse_api_key("dmk_tooshort") is None

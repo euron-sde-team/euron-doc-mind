@@ -21,7 +21,10 @@ def test_answers_with_the_best_sentence_and_cites_it() -> None:
     ]
     answer = extractive_answer("How many days of annual leave do employees get?", sources)
     assert answer.confident
-    assert answer.text == "Every full-time employee receives 24 working days of paid annual leave per year. [1]"
+    assert (
+        answer.text
+        == "Every full-time employee receives 24 working days of paid annual leave per year. [1]"
+    )
 
 
 def test_says_so_when_the_documents_do_not_cover_the_question() -> None:
@@ -39,7 +42,8 @@ def test_list_items_travel_with_their_siblings() -> None:
         "\N{BULLET} Regulation: new safety rules need legal review"
     )
     answer = extractive_answer("What are the key risks?", [source(deck, n=1, title="Board deck")])
-    assert answer.text.count("\n- ") == 2 and answer.text.startswith("- LiDAR supply")
+    assert answer.text.count("\n- ") == 2
+    assert answer.text.startswith("- LiDAR supply")
 
 
 def test_a_matching_question_heading_returns_its_whole_section() -> None:
@@ -47,7 +51,9 @@ def test_a_matching_question_heading_returns_its_whole_section() -> None:
         "How do I reset an Atlas robot?\n\nPress and hold the power button for 10 seconds. "
         "Wait 30 seconds, then press it once. The robot restarts within two minutes."
     )
-    answer = extractive_answer("How do I reset an Atlas robot?", [source(faq, n=1, title="Support FAQ")])
+    answer = extractive_answer(
+        "How do I reset an Atlas robot?", [source(faq, n=1, title="Support FAQ")]
+    )
     assert "Press and hold the power button for 10 seconds." in answer.text
     assert "The robot restarts within two minutes." in answer.text
 
@@ -79,14 +85,20 @@ def test_naming_a_document_targets_it() -> None:
 
 
 def test_meaning_breaks_ties_between_lexically_equal_units() -> None:
-    sources = [source("Uptime is reported monthly. Availability is committed at 99.9 percent.", n=1)]
+    sources = [
+        source("Uptime is reported monthly. Availability is committed at 99.9 percent.", n=1)
+    ]
     units = answer_units(sources)
     similarities = np.array([0.1, 0.9], dtype=np.float32)
-    answer = extractive_answer("What availability is committed?", sources, units=units, similarities=similarities)
+    answer = extractive_answer(
+        "What availability is committed?", sources, units=units, similarities=similarities
+    )
     assert answer.text.startswith("Availability is committed at 99.9 percent.")
 
 
 def test_units_skip_headings_and_column_summaries() -> None:
-    units = answer_units([source("Columns: Site, Region.\n\nKey risks\n\nA real sentence about risks here.", n=1)])
+    units = answer_units(
+        [source("Columns: Site, Region.\n\nKey risks\n\nA real sentence about risks here.", n=1)]
+    )
     assert [u.text for u in units] == ["A real sentence about risks here."]
     assert units[0].heading == "Key risks"

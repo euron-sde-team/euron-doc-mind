@@ -43,7 +43,9 @@ async def client():  # type: ignore[no-untyped-def]
 async def test_typed_errors_use_the_envelope_with_a_request_id(client: httpx.AsyncClient) -> None:
     response = await client.get("/missing", headers={"x-request-id": "req-123"})
     assert response.status_code == 404
-    assert response.json() == {"error": {"code": "not_found", "message": "Document not found.", "request_id": "req-123"}}
+    assert response.json() == {
+        "error": {"code": "not_found", "message": "Document not found.", "request_id": "req-123"}
+    }
     assert response.headers["x-request-id"] == "req-123"
     assert response.headers["x-content-type-options"] == "nosniff"
 

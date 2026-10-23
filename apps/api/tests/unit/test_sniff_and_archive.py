@@ -76,4 +76,9 @@ def test_archive_guard_rejects_the_wrong_kind_of_office_file() -> None:
 
 def test_archive_guard_rejects_garbage() -> None:
     with pytest.raises(ParseError, match="not a valid"):
-        check_ooxml(b"PK\x03\x04garbage", required_prefix="word/", label="Word document", max_uncompressed=10**9)
+        check_ooxml(
+            b"PK\x03\x04garbage",
+            required_prefix="word/",
+            label="Word document",
+            max_uncompressed=10**9,
+        )

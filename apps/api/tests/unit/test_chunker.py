@@ -1,3 +1,5 @@
+import itertools
+
 from docmind.ai.tokens import TokenCounter
 from docmind.ingestion.chunker import chunk_document
 from docmind.ingestion.parsers.registry import parse
@@ -43,7 +45,7 @@ def test_targets_are_respected_and_consecutive_chunks_overlap() -> None:
     _, chunks = chunk_document(doc, COUNTER, target=80, overlap=20)
     assert len(chunks) > 3
     assert all(c.token_count <= 80 for c in chunks)
-    for previous, current in zip(chunks, chunks[1:], strict=False):
+    for previous, current in itertools.pairwise(chunks):
         assert current.char_start < previous.char_end, "consecutive chunks should overlap"
 
 

@@ -4,7 +4,13 @@ from docmind.core.config import DEV_SECRET, Settings
 def test_development_defaults_are_refused_in_production() -> None:
     problems = Settings(app_env="production").production_problems()
     joined = " ".join(problems)
-    for expected in ("SESSION_SECRET", "API_KEY_PEPPER", "COOKIE_SECURE", "STORAGE_BACKEND", "QUEUE_BACKEND"):
+    for expected in (
+        "SESSION_SECRET",
+        "API_KEY_PEPPER",
+        "COOKIE_SECURE",
+        "STORAGE_BACKEND",
+        "QUEUE_BACKEND",
+    ):
         assert expected in joined
 
 
@@ -25,7 +31,9 @@ def test_a_real_production_configuration_passes() -> None:
 
 
 def test_secrets_must_differ_and_hash_embeddings_are_test_only() -> None:
-    settings = Settings(session_secret="x" * 40, api_key_pepper="x" * 40, embeddings_provider="hash")
+    settings = Settings(
+        session_secret="x" * 40, api_key_pepper="x" * 40, embeddings_provider="hash"
+    )
     problems = " ".join(settings.production_problems())
     assert "must differ" in problems
     assert "tests only" in problems
@@ -34,4 +42,6 @@ def test_secrets_must_differ_and_hash_embeddings_are_test_only() -> None:
 
 def test_generation_label() -> None:
     assert Settings().generation_label == "extractive"
-    assert Settings(llm_provider="ollama", llm_model="qwen3:4b").generation_label == "ollama:qwen3:4b"
+    assert (
+        Settings(llm_provider="ollama", llm_model="qwen3:4b").generation_label == "ollama:qwen3:4b"
+    )

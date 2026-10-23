@@ -10,7 +10,9 @@ from docmind.core.errors import UpstreamError
 
 async def test_hash_embeddings_are_deterministic_normalised_and_lexical() -> None:
     embedder = HashEmbedder(128)
-    a, b, c = await embedder.embed_documents(["annual leave policy", "annual leave policy", "robot payload"])
+    a, b, c = await embedder.embed_documents(
+        ["annual leave policy", "annual leave policy", "robot payload"]
+    )
     assert np.allclose(a, b)
     assert abs(float(np.linalg.norm(a)) - 1.0) < 1e-5
     query = await embedder.embed_query("leave policy")
@@ -33,20 +35,28 @@ async def test_cache_serves_repeats_without_calling_the_model() -> None:
     first = await cached.embed_documents(["one", "two"])
     second = await cached.embed_documents(["two", "one", "three"])
     assert inner.calls == 3
-    assert np.allclose(first[0], second[1]) and np.allclose(first[1], second[0])
+    assert np.allclose(first[0], second[1])
+    assert np.allclose(first[1], second[0])
 
 
 @respx.mock
 async def test_openai_embeddings_request_the_configured_width() -> None:
     route = respx.post("https://llm.example/v1/embeddings").mock(
         return_value=httpx.Response(
-            200, json={"data": [{"index": 1, "embedding": [0.0, 2.0]}, {"index": 0, "embedding": [3.0, 4.0]}]}
+            200,
+            json={
+                "data": [
+                    {"index": 1, "embedding": [0.0, 2.0]},
+                    {"index": 0, "embedding": [3.0, 4.0]},
+                ]
+            },
         )
     )
     embedder = OpenAIEmbedder("https://llm.example/v1", "sk-test", "text-embedding-3-small", 2, 5.0)
     vectors = await embedder.embed_documents(["a", "b"])
     assert route.calls.last.request.read().count(b'"dimensions":2') == 1
-    assert np.allclose(vectors[0], [0.6, 0.8]) and np.allclose(vectors[1], [0.0, 1.0])
+    assert np.allclose(vectors[0], [0.6, 0.8])
+    assert np.allclose(vectors[1], [0.0, 1.0])
     await embedder.aclose()
 
 
