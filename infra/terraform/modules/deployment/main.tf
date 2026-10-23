@@ -139,6 +139,9 @@ locals {
     DATABASE_URL        = "postgresql+asyncpg://${module.database.master_username}@${module.database.address}:${module.database.port}/${module.database.database_name}?ssl=require"
     DATABASE_SECRET_ARN = module.database.master_user_secret_arn
     MIGRATE_ON_BOOT     = tostring(var.migrate_on_boot)
+    # Trust X-Forwarded-For only from inside the VPC (the load balancer), so the per-address
+    # sign-in limit sees the real client and not whatever a client claims to be.
+    FORWARDED_ALLOW_IPS = module.network.vpc_cidr_block
     LLM_PROVIDER        = var.llm_provider
     LLM_MODEL           = var.llm_model
     LLM_BASE_URL        = var.llm_base_url
