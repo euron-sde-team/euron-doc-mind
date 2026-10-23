@@ -49,8 +49,15 @@ export async function signIn(page: Page, who: keyof typeof PEOPLE = "owner"): Pr
   writeFileSync(saved, JSON.stringify(await page.context().cookies()));
 }
 
-/** Wait until the page has settled: no pending network and fonts ready. */
+/** Wait until the page has settled: no pending network, fonts ready, transitions finished. */
 export async function settle(page: Page): Promise<void> {
   await page.waitForLoadState("networkidle");
-  await page.evaluate(() => document.fonts.ready);
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    // Spinners and pulsing dots repeat forever; only wait for animations that end.
+    const finite = document
+      .getAnimations()
+      .filter((animation) => animation.effect?.getTiming().iterations !== Infinity);
+    await Promise.all(finite.map((animation) => animation.finished.catch(() => undefined)));
+  });
 }
