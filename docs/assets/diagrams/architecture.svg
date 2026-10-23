@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="t d">
+  <title id="t">Euron DocMind architecture</title>
+  <desc id="d">People and API clients reach the web app and the API through one load balancer; the API stores originals in S3 and queues them on SQS; a worker parses, chunks and embeds them into PostgreSQL with pgvector; Valkey holds caches and limits; KMS and Secrets Manager protect everything; a model provider is optional.</desc>
+  <style>
+    .t { font-family: Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif; }
+    .m { font-family: JetBrains Mono, SFMono-Regular, Menlo, monospace; }
+    .h { font-size: 17px; font-weight: 650; fill: #ececf7; }
+    .s { font-size: 13px; fill: #9ea1bd; }
+    .x { font-size: 12px; fill: #7a7d99; }
+    .box { fill: #14151d; stroke: #2c2e40; stroke-width: 1.2; }
+    .hot { fill: #171833; stroke: #7b7bf0; stroke-opacity: 0.6; stroke-width: 1.4; }
+    .aws { fill: #141a24; stroke: #33405a; stroke-width: 1.2; }
+    .opt { fill: #14151d; stroke: #4a4c66; stroke-width: 1.2; stroke-dasharray: 6 6; }
+    .zone { fill: none; stroke: #2c2e40; stroke-dasharray: 5 6; stroke-width: 1.2; }
+    .arrow { stroke: #4f5270; stroke-width: 1.6; fill: none; marker-end: url(#a); }
+    .arrowhot { stroke: #7b7bf0; stroke-opacity: 0.85; stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+    .arrowopt { stroke: #4f5270; stroke-width: 1.4; fill: none; stroke-dasharray: 5 5; marker-end: url(#a); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#4f5270"/></marker>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#7b7bf0"/></marker>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#fff" stroke-opacity="0.03"/></pattern>
+  </defs>
+  <rect width="1280" height="720" rx="16" fill="#0d0e12"/>
+  <rect width="1280" height="720" rx="16" fill="url(#grid)"/>
+
+  <g class="t">
+    <text class="h" x="40" y="52">Euron DocMind</text>
+    <text class="x" x="40" y="74">as deployed by infra/terraform/modules/deployment</text>
+
+    <!-- People and clients -->
+    <rect class="box" x="40" y="170" width="200" height="104" rx="12"/>
+    <text class="h" x="60" y="205">Owners, editors,</text>
+    <text class="h" x="60" y="227">viewers</text>
+    <text class="s" x="60" y="252">app.&lt;domain&gt;</text>
+
+    <rect class="box" x="40" y="320" width="200" height="104" rx="12"/>
+    <text class="h" x="60" y="355">Your applications</text>
+    <text class="s" x="60" y="378">workspace API keys</text>
+    <text class="s" x="60" y="398">api.&lt;domain&gt;</text>
+
+    <!-- Edge -->
+    <rect class="aws" x="290" y="200" width="170" height="200" rx="12"/>
+    <text class="h" x="308" y="235">WAF</text>
+    <text class="s" x="308" y="256">optional</text>
+    <line x1="308" y1="274" x2="442" y2="274" stroke="#33405a"/>
+    <text class="h" x="308" y="306">Load balancer</text>
+    <text class="s" x="308" y="327">TLS 1.2+, host rules</text>
+    <text class="s" x="308" y="345">idle timeout 180 s</text>
+    <text class="x" x="308" y="378">app. / api.</text>
+
+    <path class="arrow" d="M240 222 C 266 222 266 262 290 262"/>
+    <path class="arrow" d="M240 372 C 266 372 266 340 290 340"/>
+
+    <!-- Private subnets -->
+    <rect class="zone" x="500" y="96" width="300" height="560" rx="14"/>
+    <text class="x" x="518" y="122">ECS Fargate, private subnets, ARM64</text>
+
+    <rect class="box" x="520" y="140" width="260" height="96" rx="12"/>
+    <text class="h" x="540" y="174">web</text>
+    <text class="s" x="540" y="196">Next.js standalone</text>
+    <text class="s" x="540" y="216">runtime config from /env.js</text>
+
+    <rect class="hot" x="520" y="268" width="260" height="128" rx="12"/>
+    <text class="h" x="540" y="302">api</text>
+    <text class="s" x="540" y="324">FastAPI + uvicorn</text>
+    <text class="s" x="540" y="344">ask (JSON or SSE), search,</text>
+    <text class="s" x="540" y="364">upload, insights, keys</text>
+    <text class="x" x="540" y="384">hybrid retrieval, cited answers</text>
+
+    <rect class="hot" x="520" y="470" width="260" height="148" rx="12"/>
+    <text class="h" x="540" y="504">worker</text>
+    <text class="s" x="540" y="526">parse, chunk, embed</text>
+    <text class="s" x="540" y="546">reads originals from S3,</text>
+    <text class="s" x="540" y="566">writes chunks to Postgres</text>
+    <text class="s" x="540" y="586">heartbeat, retries, reaper</text>
+    <text class="x" x="540" y="606">same image as the api</text>
+
+    <path class="arrow" d="M460 262 C 490 262 490 188 520 188"/>
+    <path class="arrowhot" d="M460 330 L 520 330"/>
+
+    <!-- Optional model provider -->
+    <rect class="opt" x="290" y="470" width="170" height="104" rx="12"/>
+    <text class="h" x="308" y="502">Model provider</text>
+    <text class="s" x="308" y="524">optional: OpenAI-</text>
+    <text class="s" x="308" y="542">compatible or Ollama</text>
+    <text class="x" x="308" y="562">off by default</text>
+    <path class="arrowopt" d="M520 384 C 490 384 490 500 460 500"/>
+
+    <!-- Data plane -->
+    <rect class="box" x="850" y="96" width="390" height="72" rx="12"/>
+    <text class="h" x="870" y="127">Valkey 8</text>
+    <text class="s" x="870" y="149">exact answers, embeddings, rate limits, sign-outs</text>
+
+    <rect class="aws" x="850" y="184" width="390" height="72" rx="12"/>
+    <text class="h" x="870" y="215">S3 documents bucket</text>
+    <text class="s" x="870" y="237">originals, SSE-KMS, versioned, private</text>
+
+    <rect class="hot" x="850" y="272" width="390" height="92" rx="12"/>
+    <text class="h" x="870" y="304">PostgreSQL 16 + pgvector</text>
+    <text class="s" x="870" y="326">chunks: HNSW vectors + full text (GIN)</text>
+    <text class="s" x="870" y="346">records, semantic answer cache</text>
+
+    <rect class="aws" x="850" y="380" width="390" height="72" rx="12"/>
+    <text class="h" x="870" y="411">SQS ingest queue</text>
+    <text class="s" x="870" y="433">+ dead-letter queue after three receives</text>
+
+    <rect class="aws" x="850" y="468" width="185" height="88" rx="12"/>
+    <text class="h" x="868" y="500">KMS key</text>
+    <text class="s" x="868" y="522">encrypts every store</text>
+    <text class="x" x="868" y="542">yearly rotation</text>
+
+    <rect class="aws" x="1055" y="468" width="185" height="88" rx="12"/>
+    <text class="h" x="1073" y="500">Secrets Manager</text>
+    <text class="s" x="1073" y="522">app secrets, REDIS_URL</text>
+    <text class="s" x="1073" y="542">and the DB password</text>
+
+    <!-- api to stores -->
+    <path class="arrow" d="M780 286 C 818 286 818 132 850 132"/>
+    <path class="arrow" d="M780 308 C 818 308 818 220 850 220"/>
+    <path class="arrowhot" d="M780 330 C 816 330 816 318 850 318"/>
+    <path class="arrow" d="M780 352 C 818 352 818 416 850 416"/>
+
+    <!-- queue to worker -->
+    <path class="arrowhot" d="M850 440 C 812 440 812 520 780 520"/>
+    <text class="x" x="814" y="500">poll</text>
+
+    <text class="x" x="40" y="690">KMS encrypts S3, SQS, RDS, ElastiCache, Secrets Manager, ECR and CloudWatch logs. Without a model provider, no document text leaves the deployment.</text>
+  </g>
+</svg>
