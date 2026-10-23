@@ -15,6 +15,7 @@ from docmind.core.config import Settings
 
 if TYPE_CHECKING:
     from mypy_boto3_s3 import S3Client
+    from mypy_boto3_secretsmanager import SecretsManagerClient
     from mypy_boto3_sqs import SQSClient
 
 
@@ -37,4 +38,10 @@ def s3_client(settings: Settings) -> S3Client:
 def sqs_client(settings: Settings) -> SQSClient:
     return boto3.client(
         "sqs", endpoint_url=settings.aws_endpoint_url or None, config=_config(settings)
+    )
+
+
+def secrets_client(settings: Settings) -> SecretsManagerClient:
+    return boto3.client(
+        "secretsmanager", endpoint_url=settings.aws_endpoint_url or None, config=_config(settings)
     )

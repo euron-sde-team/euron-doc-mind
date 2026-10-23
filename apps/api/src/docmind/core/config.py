@@ -37,6 +37,9 @@ class Settings(BaseSettings):
 
     # Postgres (pgvector)
     database_url: str = "postgresql+asyncpg://docmind:docmind@localhost:5451/docmind"
+    # On AWS the URL carries no password; it is read from this RDS-managed secret for each
+    # new connection, so a rotation needs no redeploy.
+    database_secret_arn: str | None = None
     database_pool_size: int = Field(default=10, ge=1, le=100)
     database_max_overflow: int = Field(default=10, ge=0, le=100)
     database_echo: bool = False
