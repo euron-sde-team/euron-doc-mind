@@ -131,26 +131,23 @@ export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; 
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 text-[13px] sm:grid-cols-3">
-            <div className="flex gap-3">
-              <Cpu className="mt-0.5 size-4 text-primary" />
-              <div>
-                <dt className="text-xs text-muted-foreground">Answer model</dt>
-                <dd className="font-medium">{generator ? (generator.uses_model ? `${generator.provider} / ${generator.model}` : "Local extractive (no model)") : "..."}</dd>
-              </div>
+            <div className="space-y-0.5">
+              <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Cpu className="size-3.5 text-primary" aria-hidden /> Answer model
+              </dt>
+              <dd className="font-medium">{generator ? (generator.uses_model ? `${generator.provider} / ${generator.model}` : "Local extractive (no model)") : "..."}</dd>
             </div>
-            <div className="flex gap-3">
-              <ScanSearch className="mt-0.5 size-4 text-primary" />
-              <div>
-                <dt className="text-xs text-muted-foreground">Embeddings</dt>
-                <dd className="font-medium">{system.data ? `${system.data.embeddings} (${system.data.embedding_dim}d)` : "..."}</dd>
-              </div>
+            <div className="space-y-0.5">
+              <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <ScanSearch className="size-3.5 text-primary" aria-hidden /> Embeddings
+              </dt>
+              <dd className="font-medium">{system.data ? `${system.data.embeddings} (${system.data.embedding_dim}d)` : "..."}</dd>
             </div>
-            <div className="flex gap-3">
-              <Database className="mt-0.5 size-4 text-primary" />
-              <div>
-                <dt className="text-xs text-muted-foreground">Tokenizer</dt>
-                <dd className="font-medium">{system.data?.tokenizer ?? "..."}</dd>
-              </div>
+            <div className="space-y-0.5">
+              <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Database className="size-3.5 text-primary" aria-hidden /> Tokenizer
+              </dt>
+              <dd className="font-medium">{system.data?.tokenizer ?? "..."}</dd>
             </div>
           </dl>
         </CardContent>
