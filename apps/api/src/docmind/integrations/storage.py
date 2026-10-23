@@ -12,7 +12,7 @@ import re
 import tempfile
 from collections.abc import AsyncIterator
 from pathlib import Path
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import anyio
 from botocore.exceptions import ClientError
@@ -20,6 +20,9 @@ from botocore.exceptions import ClientError
 from docmind.core.config import Settings
 from docmind.core.errors import NotFoundError, ServiceUnavailableError
 from docmind.integrations import aws
+
+if TYPE_CHECKING:
+    from botocore.response import StreamingBody
 
 _SAFE_KEY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9/_.-]{0,399}$")
 CHUNK_SIZE = 1024 * 1024
@@ -117,7 +120,7 @@ class S3Storage:
 
         await anyio.to_thread.run_sync(upload)
 
-    async def get(self, key: str) -> bytes:
+    async def _body(self, key: str) -> StreamingBody:
         try:
             response = await anyio.to_thread.run_sync(
                 lambda: self._client.get_object(Bucket=self.bucket, Key=key)
@@ -126,13 +129,24 @@ class S3Storage:
             if exc.response.get("Error", {}).get("Code") in {"NoSuchKey", "404"}:
                 raise NotFoundError("The original file is missing from storage.") from exc
             raise
-        body: bytes = await anyio.to_thread.run_sync(response["Body"].read)
-        return body
+        return response["Body"]
+
+    async def get(self, key: str) -> bytes:
+        body = await self._body(key)
+        try:
+            data: bytes = await anyio.to_thread.run_sync(body.read)
+        finally:
+            body.close()
+        return data
 
     async def stream(self, key: str) -> AsyncIterator[bytes]:
-        data = await self.get(key)
-        for offset in range(0, len(data), CHUNK_SIZE):
-            yield data[offset : offset + CHUNK_SIZE]
+        """Chunk by chunk, so a download never holds the whole file in memory."""
+        body = await self._body(key)
+        try:
+            while chunk := await anyio.to_thread.run_sync(body.read, CHUNK_SIZE):
+                yield chunk
+        finally:
+            body.close()
 
     async def delete(self, key: str) -> None:
         await anyio.to_thread.run_sync(
