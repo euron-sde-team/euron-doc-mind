@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, ClassVar
 
 from sqlalchemy import DateTime, MetaData, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -40,5 +40,10 @@ class IdMixin:
 
 
 class TimestampMixin:
+    # Fetch database-generated timestamps with RETURNING as part of each INSERT and UPDATE.
+    # Otherwise `updated_at` is left expired after an update, and reading it afterwards
+    # (to return the row) would need a lazy load, which async sessions cannot do.
+    __mapper_args__: ClassVar[dict[str, Any]] = {"eager_defaults": True}
+
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
