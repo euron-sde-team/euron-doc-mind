@@ -17,7 +17,9 @@ test("an editor uploads, opens, renames and deletes a document", async ({ page }
     ),
   });
 
-  const row = page.getByRole("row", { name: new RegExp(`Field notes ${stamp}|e2e-field-notes-${stamp}`) });
+  const row = page.getByRole("row", {
+    name: new RegExp(`Field notes ${stamp}|e2e-field-notes-${stamp}`),
+  });
   await expect(row.getByText("Ready")).toBeVisible({ timeout: 60_000 });
 
   await row.getByRole("link").first().click();

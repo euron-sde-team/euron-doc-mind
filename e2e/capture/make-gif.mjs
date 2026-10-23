@@ -12,7 +12,9 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const frames = path.join(here, "../.capture/frames");
 const out = path.join(here, "../../docs/assets/tour.gif");
 
-const files = readdirSync(frames).filter((f) => f.endsWith(".png")).sort();
+const files = readdirSync(frames)
+  .filter((f) => f.endsWith(".png"))
+  .sort();
 if (!files.length) throw new Error(`no frames in ${frames}; run the capture project first`);
 
 const gif = GIFEncoder();
@@ -25,4 +27,6 @@ for (const file of files) {
 }
 gif.finish();
 writeFileSync(out, gif.bytes());
-console.log(`wrote ${out} (${files.length} frames, ${(gif.bytes().length / 1024 / 1024).toFixed(1)} MB)`);
+console.log(
+  `wrote ${out} (${files.length} frames, ${(gif.bytes().length / 1024 / 1024).toFixed(1)} MB)`,
+);

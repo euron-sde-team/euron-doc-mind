@@ -34,10 +34,12 @@ function watch(page: Page, viewport: string): Crawl {
   page.on("requestfailed", (request) => {
     const reason = request.failure()?.errorText ?? "";
     // Aborted requests are navigations away or cancelled queries, not failures.
-    if (!reason.includes("ERR_ABORTED")) crawl.problems.push(`request failed: ${request.url()} ${reason}`);
+    if (!reason.includes("ERR_ABORTED"))
+      crawl.problems.push(`request failed: ${request.url()} ${reason}`);
   });
   page.on("response", (response) => {
-    if (response.status() >= 400) crawl.problems.push(`HTTP ${response.status()}: ${response.url()}`);
+    if (response.status() >= 400)
+      crawl.problems.push(`HTTP ${response.status()}: ${response.url()}`);
   });
   return crawl;
 }
@@ -45,17 +47,24 @@ function watch(page: Page, viewport: string): Crawl {
 async function inspect(crawl: Crawl, name: string): Promise<void> {
   const { page } = crawl;
   await settle(page);
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - window.innerWidth,
+  );
   if (overflow > 1) crawl.problems.push(`${name}: scrolls sideways by ${overflow}px`);
 
   const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   for (const violation of axe.violations) {
     if (violation.impact !== "serious" && violation.impact !== "critical") continue;
-    const nodes = violation.nodes.slice(0, 3).map((node) => node.target.join(" ")).join(" | ");
+    const nodes = violation.nodes
+      .slice(0, 3)
+      .map((node) => node.target.join(" "))
+      .join(" | ");
     crawl.problems.push(`${name}: axe ${violation.id} (${violation.impact}) at ${nodes}`);
   }
 
-  const hrefs = await page.$$eval('a[href^="/"]', (anchors) => anchors.map((a) => a.getAttribute("href") ?? ""));
+  const hrefs = await page.$$eval('a[href^="/"]', (anchors) =>
+    anchors.map((a) => a.getAttribute("href") ?? ""),
+  );
   for (const href of hrefs) crawl.links.add(href.split("#")[0]);
   await page.screenshot({ path: path.join(OUT, `${crawl.viewport}-${name}.png`), fullPage: true });
 }
@@ -110,7 +119,8 @@ for (const viewport of VIEWPORTS) {
 
       for (const link of crawl.links) {
         const response = await page.request.get(link);
-        if (response.status() >= 400) crawl.problems.push(`broken link: ${link} (${response.status()})`);
+        if (response.status() >= 400)
+          crawl.problems.push(`broken link: ${link} (${response.status()})`);
       }
       expect(crawl.problems).toEqual([]);
     });

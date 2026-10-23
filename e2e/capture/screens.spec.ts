@@ -44,7 +44,9 @@ test("chat, citations, viewer, library, search, insights and settings", async ({
   await tourFrame(page, 1400);
 
   // A live question, captured while it streams and when it lands.
-  await page.getByRole("textbox", { name: "Question" }).fill("What are the biggest risks the board should know about?");
+  await page
+    .getByRole("textbox", { name: "Question" })
+    .fill("What are the biggest risks the board should know about?");
   await tourFrame(page, 900);
   await page.getByRole("button", { name: "Send" }).click();
   await expect(page.getByText("LiDAR supply").first()).toBeVisible({ timeout: 90_000 });
@@ -53,7 +55,10 @@ test("chat, citations, viewer, library, search, insights and settings", async ({
   await shot(page, "03-chat-answer");
   await tourFrame(page, 2600);
 
-  await page.getByRole("button", { name: /^Source 1:/ }).first().click();
+  await page
+    .getByRole("button", { name: /^Source 1:/ })
+    .first()
+    .click();
   await expect(page.getByText("Open in document")).toBeVisible();
   await shot(page, "04-citation-preview");
   await tourFrame(page, 2200);

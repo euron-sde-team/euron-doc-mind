@@ -27,6 +27,10 @@ export default defineConfig({
   projects: [
     { name: "e2e", testDir: "tests", use: desktop },
     { name: "qa", testDir: "qa", use: desktop },
-    { name: "capture", testDir: "capture", use: { ...desktop, deviceScaleFactor: 2, colorScheme: "light" } },
+    {
+      name: "capture",
+      testDir: "capture",
+      use: { ...desktop, deviceScaleFactor: 2, colorScheme: "light" },
+    },
   ],
 });

@@ -10,7 +10,10 @@ test("hybrid search highlights matches and opens the document", async ({ page })
   await page.getByRole("button", { name: "Search" }).click();
 
   await expect(page.locator("mark").first()).toBeVisible();
-  await page.getByRole("link", { name: /Atlas Customer Support FAQ/ }).first().click();
+  await page
+    .getByRole("link", { name: /Atlas Customer Support FAQ/ })
+    .first()
+    .click();
   await expect(page).toHaveURL(new RegExp(`/w/${WORKSPACE}/documents/[0-9a-f-]+`));
 });
 

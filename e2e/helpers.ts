@@ -21,7 +21,10 @@ export function requirePassword(): string {
 const SESSIONS = path.resolve(__dirname, ".auth");
 
 /** Sign in through the form, exactly as a person does. */
-export async function signInWithForm(page: Page, who: keyof typeof PEOPLE = "owner"): Promise<void> {
+export async function signInWithForm(
+  page: Page,
+  who: keyof typeof PEOPLE = "owner",
+): Promise<void> {
   await page.goto("/login");
   await page.getByLabel("Email").fill(PEOPLE[who].email);
   await page.getByLabel("Password").fill(requirePassword());
