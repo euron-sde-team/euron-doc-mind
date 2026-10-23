@@ -67,7 +67,7 @@ class Generator(Protocol):
 class ExtractiveGenerator:
     label = "extractive"
     uses_model = False
-    version = "3"
+    version = "4"
 
     def __init__(self, embedder: Embedder | None = None) -> None:
         self.embedder = embedder
@@ -92,7 +92,7 @@ class ExtractiveGenerator:
 
 class ModelGenerator:
     uses_model = True
-    version = "2"
+    version = "3"
 
     def __init__(self, client: ChatClient, counter: TokenCounter) -> None:
         self.client = client
