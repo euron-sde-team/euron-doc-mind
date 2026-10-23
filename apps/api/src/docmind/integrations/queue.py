@@ -48,6 +48,8 @@ class ReceivedJob:
 class JobQueue(Protocol):
     async def enqueue(self, job: IngestJob) -> None: ...
 
+    async def backlog(self) -> int: ...
+
     async def check(self) -> None: ...
 
 
@@ -82,6 +84,9 @@ class InlineQueue:
     async def drain(self) -> None:
         while self._tasks:
             await asyncio.gather(*list(self._tasks), return_exceptions=True)
+
+    async def backlog(self) -> int:
+        return len(self._tasks)
 
     async def check(self) -> None:
         return None
@@ -135,12 +140,17 @@ class SqsQueue:
             )
         )
 
-    async def check(self) -> None:
-        await anyio.to_thread.run_sync(
+    async def backlog(self) -> int:
+        """Messages waiting to be received (approximate, as SQS reports it)."""
+        response = await anyio.to_thread.run_sync(
             lambda: self._client.get_queue_attributes(
                 QueueUrl=self.url, AttributeNames=["ApproximateNumberOfMessages"]
             )
         )
+        return int(response.get("Attributes", {}).get("ApproximateNumberOfMessages", "0"))
+
+    async def check(self) -> None:
+        await self.backlog()
 
 
 def build_queue(settings: Settings) -> InlineQueue | SqsQueue:

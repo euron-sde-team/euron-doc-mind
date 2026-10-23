@@ -168,11 +168,20 @@ class IngestionService:
             await session.commit()
 
     async def reap_stale(self) -> int:
-        """Re-enqueue documents stuck unfinished (a lost message, a killed worker)."""
-        cutoff = datetime.now(UTC) - timedelta(minutes=self.c.settings.stale_processing_minutes)
+        """Recover documents stuck unfinished: a lost message or a crashed worker.
+
+        A queued document is re-sent only while the queue is empty. With a backlog its
+        message is most likely still waiting, and re-sending every waiting document each
+        round would multiply the backlog. Re-sent documents restart their clock, so each is
+        re-sent at most once per stale window; those out of attempts are marked failed.
+        """
+        now = datetime.now(UTC)
+        cutoff = now - timedelta(minutes=self.c.settings.stale_processing_minutes)
+        statuses = [DocumentStatus.PROCESSING]
+        if await self.c.queue.backlog() == 0:
+            statuses.append(DocumentStatus.QUEUED)
         async with self.c.db.session() as session:
-            documents = DocumentRepository(session)
-            stale = await documents.unfinished_before(cutoff)
+            stale = await DocumentRepository(session).unfinished_before(cutoff, statuses)
             requeue = []
             for document in stale:
                 if document.attempts >= MAX_ATTEMPTS:
@@ -180,6 +189,7 @@ class IngestionService:
                     document.error = "Processing did not finish after several attempts."
                 else:
                     document.status = DocumentStatus.QUEUED
+                    document.updated_at = now
                     requeue.append(IngestJob(document.workspace_id, document.id))
             await session.commit()
         for job in requeue:

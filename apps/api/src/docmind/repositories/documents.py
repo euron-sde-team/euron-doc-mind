@@ -197,13 +197,12 @@ class DocumentRepository(Repository):
                 ],
             )
 
-    async def unfinished_before(self, cutoff: datetime, limit: int = 100) -> list[Document]:
+    async def unfinished_before(
+        self, cutoff: datetime, statuses: Sequence[DocumentStatus], limit: int = 100
+    ) -> list[Document]:
         result = await self.session.execute(
             select(Document)
-            .where(
-                Document.status.in_([DocumentStatus.QUEUED, DocumentStatus.PROCESSING]),
-                Document.updated_at < cutoff,
-            )
+            .where(Document.status.in_(list(statuses)), Document.updated_at < cutoff)
             .order_by(Document.updated_at)
             .limit(limit)
         )
