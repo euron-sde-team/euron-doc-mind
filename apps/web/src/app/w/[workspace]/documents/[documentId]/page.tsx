@@ -46,7 +46,10 @@ function SectionBody({ section, range }: { section: Section; range: [number, num
   return (
     <div className="whitespace-pre-wrap">
       {before}
-      <mark ref={mark} className="rounded bg-highlight px-0.5 text-foreground ring-1 ring-highlight-strong/60">
+      <mark
+        ref={mark}
+        className="bg-highlight text-foreground ring-highlight-strong/60 rounded px-0.5 ring-1"
+      >
         {highlighted}
       </mark>
       {after}
@@ -74,13 +77,22 @@ function Viewer() {
     );
   }
   if (document.error || !document.data) {
-    return <EmptyState className="h-full" title="Document not found" description={document.error?.message} />;
+    return (
+      <EmptyState
+        className="h-full"
+        title="Document not found"
+        description={document.error?.message}
+      />
+    );
   }
   const data = document.data;
 
   async function askAbout() {
     try {
-      const conversation = await create.mutateAsync({ title: `About ${data.title}`, document_ids: [data.id] });
+      const conversation = await create.mutateAsync({
+        title: `About ${data.title}`,
+        document_ids: [data.id],
+      });
       router.push(`/w/${workspace}/chat/${conversation.id}`);
     } catch (error) {
       toast.error((error as Error).message);
@@ -89,15 +101,18 @@ function Viewer() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-6 lg:px-10">
-      <Link href={`/w/${workspace}/documents`} className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground">
+      <Link
+        href={`/w/${workspace}/documents`}
+        className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 text-[13px]"
+      >
         <ArrowLeft className="size-3.5" /> Documents
       </Link>
-      <div className="mt-3 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
+      <div className="border-border mt-3 flex flex-wrap items-start justify-between gap-4 border-b pb-5">
         <div className="flex min-w-0 items-start gap-3">
           <KindIcon kind={data.kind} className="size-10" />
           <div className="min-w-0">
             <h1 className="truncate text-xl font-semibold tracking-tight">{data.title}</h1>
-            <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground">
+            <p className="text-muted-foreground mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
               <span>{kindLabel(data.kind)}</span>
               <span aria-hidden>&middot;</span>
               <span>{formatBytes(data.size_bytes)}</span>
@@ -133,7 +148,9 @@ function Viewer() {
       ) : null}
       {data.status !== "ready" ? (
         <EmptyState
-          title={data.status === "failed" ? "This document could not be indexed" : "Indexing in progress"}
+          title={
+            data.status === "failed" ? "This document could not be indexed" : "Indexing in progress"
+          }
           description={data.error ?? "Sections appear here as soon as processing finishes."}
         />
       ) : (
@@ -147,7 +164,7 @@ function Viewer() {
                     className={cn(
                       "block truncate rounded-lg px-2.5 py-1.5 text-[13px] transition-colors",
                       section.ordinal === targetOrdinal
-                        ? "bg-accent font-medium text-accent-foreground"
+                        ? "bg-accent text-accent-foreground font-medium"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
                   >
@@ -159,21 +176,26 @@ function Viewer() {
           </nav>
           <div className="space-y-5">
             {data.sections.map((section) => {
-              const isTarget = section.ordinal === targetOrdinal && Number.isFinite(start) && end > start;
+              const isTarget =
+                section.ordinal === targetOrdinal && Number.isFinite(start) && end > start;
               return (
                 <section
                   key={section.ordinal}
                   id={`section-${section.ordinal}`}
                   className={cn(
-                    "scroll-mt-6 rounded-xl border bg-card px-6 py-5 shadow-sm",
-                    isTarget ? "border-primary/40 ring-2 ring-primary/15" : "border-border",
+                    "bg-card scroll-mt-6 rounded-xl border px-6 py-5 shadow-sm",
+                    isTarget ? "border-primary/40 ring-primary/15 ring-2" : "border-border",
                   )}
                 >
                   <header className="mb-3 flex items-center justify-between gap-3">
-                    <h2 className="text-[13px] font-semibold text-muted-foreground">{section.label}</h2>
-                    <span className="text-[11.5px] tabular-nums text-subtle">{formatNumber(section.token_count)} tokens</span>
+                    <h2 className="text-muted-foreground text-[13px] font-semibold">
+                      {section.label}
+                    </h2>
+                    <span className="text-subtle text-[11.5px] tabular-nums">
+                      {formatNumber(section.token_count)} tokens
+                    </span>
                   </header>
-                  <div className="text-[14px] leading-7 text-foreground/90">
+                  <div className="text-foreground/90 text-[14px] leading-7">
                     <SectionBody section={section} range={isTarget ? [start, end] : null} />
                   </div>
                 </section>

@@ -11,7 +11,8 @@ import { THEME_SCRIPT } from "@/lib/theme-script";
 
 export const metadata: Metadata = {
   title: { default: "Euron DocMind", template: "%s | DocMind" },
-  description: "Private, cited chat over your PDFs, Word files, spreadsheets, slide decks and notes.",
+  description:
+    "Private, cited chat over your PDFs, Word files, spreadsheets, slide decks and notes.",
   icons: { icon: "/icon.svg" },
 };
 

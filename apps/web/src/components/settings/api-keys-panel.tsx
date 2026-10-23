@@ -27,7 +27,11 @@ export function ApiKeysPanel({ workspace }: { workspace: string }) {
 
   async function create(event: FormEvent) {
     event.preventDefault();
-    const key = await actions.create.mutateAsync({ name, role, expires_in_days: expires ? Number(expires) : null });
+    const key = await actions.create.mutateAsync({
+      name,
+      role,
+      expires_in_days: expires ? Number(expires) : null,
+    });
     setCreated(key);
     setName("");
   }
@@ -38,8 +42,10 @@ export function ApiKeysPanel({ workspace }: { workspace: string }) {
 
   return (
     <Card>
-      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3.5">
-        <p className="text-[13px] text-muted-foreground">Keys let your own apps ask and search this workspace over the API.</p>
+      <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
+        <p className="text-muted-foreground text-[13px]">
+          Keys let your own apps ask and search this workspace over the API.
+        </p>
         <Button size="sm" onClick={() => setOpen(true)}>
           <KeyRound /> Create key
         </Button>
@@ -49,18 +55,23 @@ export function ApiKeysPanel({ workspace }: { workspace: string }) {
           <Skeleton className="h-10" />
         </div>
       ) : keys.data?.length ? (
-        <ul className="divide-y divide-border">
+        <ul className="divide-border divide-y">
           {keys.data.map((key) => (
             <li key={key.id} className="flex flex-wrap items-center gap-3 px-5 py-3">
               <div className="min-w-0 flex-1">
                 <p className="flex items-center gap-2 text-[13.5px] font-medium">
                   {key.name}
-                  <Badge tone="outline" className="capitalize">{key.role}</Badge>
+                  <Badge tone="outline" className="capitalize">
+                    {key.role}
+                  </Badge>
                   {key.revoked_at ? <Badge tone="danger">Revoked</Badge> : null}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  <code className="font-mono">dmk_{key.prefix}_...</code> &middot; created {formatRelative(key.created_at)} &middot;{" "}
-                  {key.last_used_at ? `last used ${formatRelative(key.last_used_at)}` : "never used"}
+                <p className="text-muted-foreground text-xs">
+                  <code className="font-mono">dmk_{key.prefix}_...</code> &middot; created{" "}
+                  {formatRelative(key.created_at)} &middot;{" "}
+                  {key.last_used_at
+                    ? `last used ${formatRelative(key.last_used_at)}`
+                    : "never used"}
                   {key.expires_at ? <> &middot; expires {formatDate(key.expires_at)}</> : null}
                 </p>
               </div>
@@ -80,7 +91,11 @@ export function ApiKeysPanel({ workspace }: { workspace: string }) {
           ))}
         </ul>
       ) : (
-        <EmptyState icon={<KeyRound />} title="No API keys yet" description="Create one to call DocMind from scripts and services." />
+        <EmptyState
+          icon={<KeyRound />}
+          title="No API keys yet"
+          description="Create one to call DocMind from scripts and services."
+        />
       )}
       <Dialog
         open={open}
@@ -91,7 +106,11 @@ export function ApiKeysPanel({ workspace }: { workspace: string }) {
       >
         <DialogContent
           title={created ? "Copy your key now" : "Create an API key"}
-          description={created ? "This is the only time the full key is shown. Only a keyed hash is stored." : "Keys are scoped to this workspace."}
+          description={
+            created
+              ? "This is the only time the full key is shown. Only a keyed hash is stored."
+              : "Keys are scoped to this workspace."
+          }
           className="w-[min(92vw,36rem)]"
         >
           {created ? (
@@ -100,26 +119,48 @@ export function ApiKeysPanel({ workspace }: { workspace: string }) {
               <Label>Try it</Label>
               <CopyField value={curl} label="Example request" />
               <DialogFooter>
-                <Button onClick={() => { setOpen(false); setCreated(null); }}>Done</Button>
+                <Button
+                  onClick={() => {
+                    setOpen(false);
+                    setCreated(null);
+                  }}
+                >
+                  Done
+                </Button>
               </DialogFooter>
             </div>
           ) : (
             <form onSubmit={create} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="key-name">Name</Label>
-                <Input id="key-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Support bot" required autoFocus />
+                <Input
+                  id="key-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Support bot"
+                  required
+                  autoFocus
+                />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="key-role">Access</Label>
-                  <NativeSelect id="key-role" value={role} onChange={(e) => setRole(e.target.value as "viewer" | "editor")}>
+                  <NativeSelect
+                    id="key-role"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as "viewer" | "editor")}
+                  >
                     <option value="viewer">Viewer: ask and search</option>
                     <option value="editor">Editor: also upload</option>
                   </NativeSelect>
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="key-expiry">Expires</Label>
-                  <NativeSelect id="key-expiry" value={expires} onChange={(e) => setExpires(e.target.value)}>
+                  <NativeSelect
+                    id="key-expiry"
+                    value={expires}
+                    onChange={(e) => setExpires(e.target.value)}
+                  >
                     <option value="30">In 30 days</option>
                     <option value="90">In 90 days</option>
                     <option value="365">In a year</option>
@@ -127,7 +168,9 @@ export function ApiKeysPanel({ workspace }: { workspace: string }) {
                   </NativeSelect>
                 </div>
               </div>
-              <FieldHint>Use it as <code className="font-mono">Authorization: Bearer dmk_...</code></FieldHint>
+              <FieldHint>
+                Use it as <code className="font-mono">Authorization: Bearer dmk_...</code>
+              </FieldHint>
               {actions.create.error ? <ErrorNotice message={actions.create.error.message} /> : null}
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>

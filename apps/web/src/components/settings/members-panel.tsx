@@ -42,8 +42,10 @@ export function MembersPanel({ workspace, isOwner }: { workspace: string; isOwne
 
   return (
     <Card>
-      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3.5">
-        <p className="text-[13px] text-muted-foreground">{members.data?.length ?? 0} people can use this workspace.</p>
+      <div className="border-border flex items-center justify-between gap-3 border-b px-5 py-3.5">
+        <p className="text-muted-foreground text-[13px]">
+          {members.data?.length ?? 0} people can use this workspace.
+        </p>
         {isOwner ? (
           <Button size="sm" onClick={() => setAdding(true)}>
             <UserPlus /> Add member
@@ -56,17 +58,20 @@ export function MembersPanel({ workspace, isOwner }: { workspace: string; isOwne
           <Skeleton className="h-10" />
         </div>
       ) : (
-        <ul className="divide-y divide-border">
+        <ul className="divide-border divide-y">
           {(members.data ?? []).map((member) => (
             <li key={member.user_id} className="flex flex-wrap items-center gap-3 px-5 py-3">
-              <span className="flex size-8 items-center justify-center rounded-full bg-muted text-[11px] font-semibold ring-1 ring-border">
+              <span className="bg-muted ring-border flex size-8 items-center justify-center rounded-full text-[11px] font-semibold ring-1">
                 {initials(member.name)}
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13.5px] font-medium">
-                  {member.name} {member.user_id === me.data?.user.id ? <span className="text-muted-foreground">(you)</span> : null}
+                  {member.name}{" "}
+                  {member.user_id === me.data?.user.id ? (
+                    <span className="text-muted-foreground">(you)</span>
+                  ) : null}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">
+                <p className="text-muted-foreground truncate text-xs">
                   {member.email} &middot; joined {formatRelative(member.joined_at)}
                 </p>
               </div>
@@ -78,7 +83,10 @@ export function MembersPanel({ workspace, isOwner }: { workspace: string; isOwne
                     aria-label={`Role for ${member.name}`}
                     onChange={async (e) => {
                       try {
-                        await actions.changeRole.mutateAsync({ userId: member.user_id, role: e.target.value as Role });
+                        await actions.changeRole.mutateAsync({
+                          userId: member.user_id,
+                          role: e.target.value as Role,
+                        });
                         toast.success("Role updated");
                       } catch (error) {
                         toast.error((error as Error).message);
@@ -105,7 +113,7 @@ export function MembersPanel({ workspace, isOwner }: { workspace: string; isOwne
                   </Button>
                 </>
               ) : (
-                <span className="text-[13px] capitalize text-muted-foreground">{member.role}</span>
+                <span className="text-muted-foreground text-[13px] capitalize">{member.role}</span>
               )}
             </li>
           ))}
@@ -130,22 +138,45 @@ export function MembersPanel({ workspace, isOwner }: { workspace: string; isOwne
             <div className="space-y-3">
               <CopyField value={password} label="Temporary password" />
               <DialogFooter>
-                <Button onClick={() => { setAdding(false); setPassword(null); }}>Done</Button>
+                <Button
+                  onClick={() => {
+                    setAdding(false);
+                    setPassword(null);
+                  }}
+                >
+                  Done
+                </Button>
               </DialogFooter>
             </div>
           ) : (
             <form onSubmit={add} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="member-email">Email</Label>
-                <Input id="member-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
+                <Input
+                  id="member-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoFocus
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="member-name">Name</Label>
-                <Input id="member-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Optional" />
+                <Input
+                  id="member-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Optional"
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="member-role">Role</Label>
-                <NativeSelect id="member-role" value={role} onChange={(e) => setRole(e.target.value as Role)}>
+                <NativeSelect
+                  id="member-role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value as Role)}
+                >
                   <option value="viewer">Viewer</option>
                   <option value="editor">Editor</option>
                   <option value="owner">Owner</option>

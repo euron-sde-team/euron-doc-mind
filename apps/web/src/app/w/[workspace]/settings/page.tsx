@@ -20,7 +20,10 @@ export default function SettingsPage() {
 
   return (
     <PageBody className="max-w-4xl">
-      <PageHeader title="Settings" description="Workspace details, answering, people and programmatic access." />
+      <PageHeader
+        title="Settings"
+        description="Workspace details, answering, people and programmatic access."
+      />
       {query.error ? <ErrorNotice message={query.error.message} /> : null}
       {!data ? (
         <Skeleton className="h-64" />

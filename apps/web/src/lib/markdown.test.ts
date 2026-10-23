@@ -25,7 +25,9 @@ describe("parseInline", () => {
 
 describe("parseAnswer", () => {
   it("groups bullets into a list and keeps paragraphs", () => {
-    const blocks = parseAnswer("The main risks:\n- LiDAR supply [1]\n- Customer concentration [1]\n\nBoth are tracked.");
+    const blocks = parseAnswer(
+      "The main risks:\n- LiDAR supply [1]\n- Customer concentration [1]\n\nBoth are tracked.",
+    );
     expect(blocks.map((b) => b.type)).toEqual(["paragraph", "list", "paragraph"]);
     const list = blocks[1];
     expect(list?.type === "list" && list.items.length).toBe(2);

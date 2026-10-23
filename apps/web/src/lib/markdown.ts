@@ -41,7 +41,8 @@ export function parseAnswer(markdown: string): Block[] {
   let list: { ordered: boolean; items: Inline[][] } | null = null;
 
   const flushParagraph = () => {
-    if (paragraph.length) blocks.push({ type: "paragraph", inlines: parseInline(paragraph.join(" ")) });
+    if (paragraph.length)
+      blocks.push({ type: "paragraph", inlines: parseInline(paragraph.join(" ")) });
     paragraph = [];
   };
   const flushList = () => {

@@ -26,12 +26,22 @@ export default function NewChatPage() {
   return (
     <div className="flex min-h-full flex-col">
       <div className="flex flex-1 items-center justify-center px-6 py-14">
-        <ChatEmpty workspace={workspace} stats={stats.data} recent={conversations.data ?? []} onPick={start} />
+        <ChatEmpty
+          workspace={workspace}
+          stats={stats.data}
+          recent={conversations.data ?? []}
+          onPick={start}
+        />
       </div>
-      <div className="sticky bottom-0 bg-gradient-to-t from-background via-background to-transparent pt-6">
+      <div className="from-background via-background sticky bottom-0 bg-gradient-to-t to-transparent pt-6">
         <div className="mx-auto w-full max-w-3xl px-6 pb-6">
-          <Composer onSend={start} busy={create.isPending} disabled={stats.data?.ready === 0} autoFocus />
-          <p className="mt-2 text-center text-[11.5px] text-subtle">
+          <Composer
+            onSend={start}
+            busy={create.isPending}
+            disabled={stats.data?.ready === 0}
+            autoFocus
+          />
+          <p className="text-subtle mt-2 text-center text-[11.5px]">
             Answers cite your documents. Check the sources for anything that matters.
           </p>
         </div>

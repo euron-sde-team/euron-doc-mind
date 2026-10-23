@@ -31,7 +31,7 @@ export function ChatEmpty({
     <div className="flex flex-col items-center text-center">
       <BrandMark className="size-11" />
       <h1 className="mt-5 text-[26px] font-semibold tracking-tight">Ask your documents</h1>
-      <p className="mt-2 max-w-md text-[14px] text-muted-foreground">
+      <p className="text-muted-foreground mt-2 max-w-md text-[14px]">
         {empty
           ? "Upload a few files first. DocMind reads PDFs, Word, Excel, CSV, PowerPoint, text, Markdown and HTML."
           : stats
@@ -51,9 +51,9 @@ export function ChatEmpty({
               key={question}
               type="button"
               onClick={() => onPick(question)}
-              className="group flex items-start gap-2.5 rounded-xl border border-border bg-card px-3.5 py-3 text-left text-[13.5px] shadow-sm transition-colors hover:border-primary/40 hover:bg-accent/40"
+              className="group border-border bg-card hover:border-primary/40 hover:bg-accent/40 flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-left text-[13.5px] shadow-sm transition-colors"
             >
-              <Sparkles className="mt-0.5 size-4 shrink-0 text-primary" />
+              <Sparkles className="text-primary mt-0.5 size-4 shrink-0" />
               <span className="line-clamp-2">{question}</span>
             </button>
           ))}

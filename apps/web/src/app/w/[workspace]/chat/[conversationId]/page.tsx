@@ -35,22 +35,31 @@ function Conversation() {
   }, [messages.data?.length, pending?.text, pending?.status]);
 
   if (messages.error) {
-    return <EmptyState className="h-full" title="Conversation not found" description={messages.error.message} />;
+    return (
+      <EmptyState
+        className="h-full"
+        title="Conversation not found"
+        description={messages.error.message}
+      />
+    );
   }
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="sticky top-0 z-10 border-b border-border/70 bg-background/85 backdrop-blur">
+      <div className="border-border/70 bg-background/85 sticky top-0 z-10 border-b backdrop-blur">
         <div className="mx-auto flex h-12 w-full max-w-3xl items-center justify-between gap-3 px-6">
-          <h1 className="truncate text-[13.5px] font-medium">{conversation?.title ?? "Conversation"}</h1>
+          <h1 className="truncate text-[13.5px] font-medium">
+            {conversation?.title ?? "Conversation"}
+          </h1>
           {conversation?.document_ids?.length ? (
             <Badge tone="primary">
-              <Filter /> {conversation.document_ids.length} document{conversation.document_ids.length > 1 ? "s" : ""}
+              <Filter /> {conversation.document_ids.length} document
+              {conversation.document_ids.length > 1 ? "s" : ""}
             </Badge>
           ) : null}
         </div>
       </div>
-      <div className="mx-auto w-full max-w-3xl flex-1 px-6 pb-10 pt-8">
+      <div className="mx-auto w-full max-w-3xl flex-1 px-6 pt-8 pb-10">
         {messages.isLoading ? (
           <div className="space-y-6">
             <Skeleton className="ml-auto h-10 w-2/3 rounded-2xl" />
@@ -66,7 +75,7 @@ function Conversation() {
         )}
         <div ref={bottom} />
       </div>
-      <div className="sticky bottom-0 bg-gradient-to-t from-background via-background to-transparent pt-6">
+      <div className="from-background via-background sticky bottom-0 bg-gradient-to-t to-transparent pt-6">
         <div className="mx-auto w-full max-w-3xl px-6 pb-6">
           <Composer
             onSend={(question) => void ask(conversationId, question)}

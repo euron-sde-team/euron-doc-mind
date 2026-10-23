@@ -20,7 +20,9 @@ export function SourcesPanel({
   const [open, setOpen] = useState(false);
   if (!sources.length) return null;
   const cited = new Set(citations.map((c) => c.n));
-  const ordered = [...sources].sort((a, b) => Number(cited.has(b.n)) - Number(cited.has(a.n)) || a.n - b.n);
+  const ordered = [...sources].sort(
+    (a, b) => Number(cited.has(b.n)) - Number(cited.has(a.n)) || a.n - b.n,
+  );
   const visible = open ? ordered : ordered.slice(0, 3);
 
   return (
@@ -31,17 +33,23 @@ export function SourcesPanel({
             key={source.chunk_id}
             href={viewerHref(workspace, source)}
             className={cn(
-              "group rounded-lg border px-3 py-2 transition-colors hover:border-primary/40 hover:bg-accent/40",
+              "group hover:border-primary/40 hover:bg-accent/40 rounded-lg border px-3 py-2 transition-colors",
               // Retrieved but not cited: a quieter surface, never lower text contrast.
-              cited.has(source.n) ? "border-border bg-card" : "border-dashed border-border bg-muted/40",
+              cited.has(source.n)
+                ? "border-border bg-card"
+                : "border-border bg-muted/40 border-dashed",
             )}
           >
             <span className="flex items-center gap-1.5 text-[12px] font-medium">
-              <span className="rounded bg-muted px-1 font-mono text-[10.5px] text-muted-foreground">{source.n}</span>
-              <FileText className="size-3.5 text-subtle" />
+              <span className="bg-muted text-muted-foreground rounded px-1 font-mono text-[10.5px]">
+                {source.n}
+              </span>
+              <FileText className="text-subtle size-3.5" />
               <span className="truncate">{source.document_title}</span>
             </span>
-            <span className="mt-0.5 block truncate text-[11.5px] text-muted-foreground">{source.location}</span>
+            <span className="text-muted-foreground mt-0.5 block truncate text-[11.5px]">
+              {source.location}
+            </span>
           </Link>
         ))}
       </div>
@@ -49,7 +57,7 @@ export function SourcesPanel({
         <button
           type="button"
           onClick={() => setOpen(!open)}
-          className="mt-2 inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground mt-2 inline-flex items-center gap-1 text-[12px] font-medium"
         >
           <ChevronDown className={cn("size-3.5 transition-transform", open && "rotate-180")} />
           {open ? "Fewer sources" : `All ${sources.length} sources`}

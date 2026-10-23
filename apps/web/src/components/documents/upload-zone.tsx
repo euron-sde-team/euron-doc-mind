@@ -43,8 +43,10 @@ export function useUploader(workspace: string) {
             : `Uploaded ${result.created.length} files. Indexing now.`,
         );
       }
-      for (const duplicate of result.duplicates) toast.info(`${duplicate.filename} is already in this workspace.`);
-      for (const rejected of result.rejected) toast.error(`${rejected.filename}: ${rejected.message}`);
+      for (const duplicate of result.duplicates)
+        toast.info(`${duplicate.filename} is already in this workspace.`);
+      for (const rejected of result.rejected)
+        toast.error(`${rejected.filename}: ${rejected.message}`);
     } catch (error) {
       toast.error((error as Error).message);
     }
@@ -52,7 +54,13 @@ export function useUploader(workspace: string) {
   return { send, pending: upload.isPending };
 }
 
-export function UploadZone({ workspace, compact = false }: { workspace: string; compact?: boolean }) {
+export function UploadZone({
+  workspace,
+  compact = false,
+}: {
+  workspace: string;
+  compact?: boolean;
+}) {
   const system = useSystemInfo();
   const { send, pending } = useUploader(workspace);
   const picker = useFilePicker((files) => void send(files));
@@ -74,24 +82,38 @@ export function UploadZone({ workspace, compact = false }: { workspace: string; 
       onDragLeave={() => setOver(false)}
       onDrop={onDrop}
       className={cn(
-        "flex items-center gap-4 rounded-xl border border-dashed border-input bg-card/60 transition-colors",
+        "border-input bg-card/60 flex items-center gap-4 rounded-xl border border-dashed transition-colors",
         compact ? "px-4 py-3" : "flex-col justify-center px-6 py-12 text-center",
         over && "border-primary bg-accent/50",
       )}
     >
       {picker.element}
-      <span className={cn("flex items-center justify-center rounded-xl bg-accent text-accent-foreground", compact ? "size-9" : "size-12")}>
-        {pending ? <Spinner className="text-accent-foreground" /> : <CloudUpload className={compact ? "size-4" : "size-5"} />}
+      <span
+        className={cn(
+          "bg-accent text-accent-foreground flex items-center justify-center rounded-xl",
+          compact ? "size-9" : "size-12",
+        )}
+      >
+        {pending ? (
+          <Spinner className="text-accent-foreground" />
+        ) : (
+          <CloudUpload className={compact ? "size-4" : "size-5"} />
+        )}
       </span>
       <div className={compact ? "min-w-0 flex-1" : ""}>
         <p className="text-[13.5px] font-medium">
           Drop files here or{" "}
-          <button type="button" onClick={picker.open} className="font-semibold text-primary hover:underline">
+          <button
+            type="button"
+            onClick={picker.open}
+            className="text-primary font-semibold hover:underline"
+          >
             browse
           </button>
         </p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          PDF, Word, Excel, CSV, PowerPoint, text, Markdown or HTML, up to {system.data?.max_upload_mb ?? 50} MB each.
+        <p className="text-muted-foreground mt-0.5 text-xs">
+          PDF, Word, Excel, CSV, PowerPoint, text, Markdown or HTML, up to{" "}
+          {system.data?.max_upload_mb ?? 50} MB each.
         </p>
       </div>
     </div>

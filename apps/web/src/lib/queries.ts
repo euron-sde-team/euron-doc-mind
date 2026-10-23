@@ -43,7 +43,11 @@ export const qk = {
 export type DocumentFilters = { status?: string; kind?: string; q?: string };
 
 export function useSystemInfo() {
-  return useQuery({ queryKey: qk.system, queryFn: () => api<SystemInfo>("/api/v1/system/info"), staleTime: 300_000 });
+  return useQuery({
+    queryKey: qk.system,
+    queryFn: () => api<SystemInfo>("/api/v1/system/info"),
+    staleTime: 300_000,
+  });
 }
 
 export function useMe() {
@@ -77,7 +81,10 @@ export function useLogout() {
 }
 
 export function useWorkspace(workspace: string) {
-  return useQuery({ queryKey: qk.workspace(workspace), queryFn: () => api<Workspace>(ws(workspace)) });
+  return useQuery({
+    queryKey: qk.workspace(workspace),
+    queryFn: () => api<Workspace>(ws(workspace)),
+  });
 }
 
 export function useCreateWorkspace() {
@@ -109,7 +116,9 @@ export function useDocuments(workspace: string, filters: DocumentFilters) {
     queryFn: () => api<DocumentPage>(`${ws(workspace)}/documents?${params}`),
     // Poll only while something is still being indexed.
     refetchInterval: (query) =>
-      query.state.data?.items.some((d) => d.status === "queued" || d.status === "processing") ? 2000 : false,
+      query.state.data?.items.some((d) => d.status === "queued" || d.status === "processing")
+        ? 2000
+        : false,
   });
 }
 
@@ -156,11 +165,13 @@ export function useDocumentAction(workspace: string) {
       onSuccess: refresh,
     }),
     reprocess: useMutation({
-      mutationFn: (id: string) => api(`${ws(workspace)}/documents/${id}/reprocess`, { method: "POST" }),
+      mutationFn: (id: string) =>
+        api(`${ws(workspace)}/documents/${id}/reprocess`, { method: "POST" }),
       onSuccess: refresh,
     }),
     remove: useMutation({
-      mutationFn: (id: string) => api<void>(`${ws(workspace)}/documents/${id}`, { method: "DELETE" }),
+      mutationFn: (id: string) =>
+        api<void>(`${ws(workspace)}/documents/${id}`, { method: "DELETE" }),
       onSuccess: refresh,
     }),
   };
@@ -200,7 +211,8 @@ export function useConversationActions(workspace: string) {
       onSuccess: refresh,
     }),
     remove: useMutation({
-      mutationFn: (id: string) => api<void>(`${ws(workspace)}/conversations/${id}`, { method: "DELETE" }),
+      mutationFn: (id: string) =>
+        api<void>(`${ws(workspace)}/conversations/${id}`, { method: "DELETE" }),
       onSuccess: refresh,
     }),
   };
@@ -221,7 +233,10 @@ export function useInsights(workspace: string, days: number) {
 }
 
 export function useMembers(workspace: string) {
-  return useQuery({ queryKey: qk.members(workspace), queryFn: () => api<Member[]>(`${ws(workspace)}/members`) });
+  return useQuery({
+    queryKey: qk.members(workspace),
+    queryFn: () => api<Member[]>(`${ws(workspace)}/members`),
+  });
 }
 
 export function useMemberActions(workspace: string) {
@@ -242,7 +257,8 @@ export function useMemberActions(workspace: string) {
       onSuccess: refresh,
     }),
     remove: useMutation({
-      mutationFn: (userId: string) => api<void>(`${ws(workspace)}/members/${userId}`, { method: "DELETE" }),
+      mutationFn: (userId: string) =>
+        api<void>(`${ws(workspace)}/members/${userId}`, { method: "DELETE" }),
       onSuccess: refresh,
     }),
   };
@@ -261,12 +277,16 @@ export function useApiKeyActions(workspace: string) {
   const refresh = () => client.invalidateQueries({ queryKey: qk.apiKeys(workspace) });
   return {
     create: useMutation({
-      mutationFn: (body: { name: string; role: "viewer" | "editor"; expires_in_days: number | null }) =>
-        api<ApiKeyCreated>(`${ws(workspace)}/api-keys`, { method: "POST", json: body }),
+      mutationFn: (body: {
+        name: string;
+        role: "viewer" | "editor";
+        expires_in_days: number | null;
+      }) => api<ApiKeyCreated>(`${ws(workspace)}/api-keys`, { method: "POST", json: body }),
       onSuccess: refresh,
     }),
     revoke: useMutation({
-      mutationFn: (id: string) => api<void>(`${ws(workspace)}/api-keys/${id}`, { method: "DELETE" }),
+      mutationFn: (id: string) =>
+        api<void>(`${ws(workspace)}/api-keys/${id}`, { method: "DELETE" }),
       onSuccess: refresh,
     }),
   };

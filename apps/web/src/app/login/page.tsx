@@ -13,9 +13,21 @@ import { runtimeEnv } from "@/lib/runtime-env";
 import { useLogin, useSignup, useSystemInfo } from "@/lib/queries";
 
 const FEATURES = [
-  { icon: Lock, title: "Private by design", text: "Files, embeddings and answers stay on infrastructure you run." },
-  { icon: BookOpenCheck, title: "Every answer cited", text: "Click a citation to land on the exact page, slide or row." },
-  { icon: Coins, title: "Far fewer tokens", text: "Retrieval sends a few passages, not whole documents." },
+  {
+    icon: Lock,
+    title: "Private by design",
+    text: "Files, embeddings and answers stay on infrastructure you run.",
+  },
+  {
+    icon: BookOpenCheck,
+    title: "Every answer cited",
+    text: "Click a citation to land on the exact page, slide or row.",
+  },
+  {
+    icon: Coins,
+    title: "Far fewer tokens",
+    text: "Retrieval sends a few passages, not whole documents.",
+  },
 ];
 
 function LoginForm() {
@@ -51,7 +63,7 @@ function LoginForm() {
         <h1 className="text-2xl font-semibold tracking-tight">
           {setup ? "Set up DocMind" : creating ? "Create your account" : "Welcome back"}
         </h1>
-        <p className="mt-1.5 text-[13.5px] text-muted-foreground">
+        <p className="text-muted-foreground mt-1.5 text-[13.5px]">
           {setup
             ? "Create the first account. It becomes the administrator of this deployment."
             : creating
@@ -62,7 +74,13 @@ function LoginForm() {
       {creating ? (
         <div className="space-y-1.5">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} required />
+          <Input
+            id="name"
+            autoComplete="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </div>
       ) : null}
       <div className="space-y-1.5">
@@ -94,11 +112,11 @@ function LoginForm() {
         {creating ? "Create account" : "Sign in"}
       </Button>
       {!setup && system.data?.allow_signup ? (
-        <p className="text-center text-[13px] text-muted-foreground">
+        <p className="text-muted-foreground text-center text-[13px]">
           {creating ? "Already have an account?" : "New here?"}{" "}
           <button
             type="button"
-            className="font-medium text-primary hover:underline"
+            className="text-primary font-medium hover:underline"
             onClick={() => setMode(creating ? "signin" : "signup")}
           >
             {creating ? "Sign in" : "Create an account"}
@@ -124,11 +142,12 @@ export default function LoginPage() {
         />
         <Wordmark name={productName} className="relative [&_span]:text-white" />
         <div className="relative max-w-md">
-          <h2 className="text-[34px] font-semibold leading-tight tracking-tight">
+          <h2 className="text-[34px] leading-tight font-semibold tracking-tight">
             Ask your documents. Get answers you can check.
           </h2>
           <p className="mt-3 text-[15px] text-white/70">
-            PDFs, Word files, spreadsheets, slide decks and notes, indexed on your own infrastructure.
+            PDFs, Word files, spreadsheets, slide decks and notes, indexed on your own
+            infrastructure.
           </p>
           <ul className="mt-8 space-y-4">
             {FEATURES.map(({ icon: Icon, title, text }) => (

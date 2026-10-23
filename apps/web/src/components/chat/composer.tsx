@@ -52,7 +52,7 @@ export function Composer({
     <form
       onSubmit={submit}
       className={cn(
-        "flex items-end gap-2 rounded-2xl border border-input bg-card p-2 pl-4 shadow-md transition-colors focus-within:border-ring",
+        "border-input bg-card focus-within:border-ring flex items-end gap-2 rounded-2xl border p-2 pl-4 shadow-md transition-colors",
         className,
       )}
     >
@@ -67,14 +67,19 @@ export function Composer({
         autoFocus={autoFocus}
         maxLength={2000}
         aria-label="Question"
-        className="max-h-[200px] min-h-6 flex-1 resize-none bg-transparent py-1.5 text-[14.5px] leading-6 outline-none placeholder:text-subtle"
+        className="placeholder:text-subtle max-h-[200px] min-h-6 flex-1 resize-none bg-transparent py-1.5 text-[14.5px] leading-6 outline-none"
       />
       {busy && onStop ? (
         <Button type="button" size="icon-sm" variant="secondary" onClick={onStop} aria-label="Stop">
           <Square className="!size-3 fill-current" />
         </Button>
       ) : (
-        <Button type="submit" size="icon-sm" disabled={!value.trim() || busy || disabled} aria-label="Send">
+        <Button
+          type="submit"
+          size="icon-sm"
+          disabled={!value.trim() || busy || disabled}
+          aria-label="Send"
+        >
           <ArrowUp />
         </Button>
       )}

@@ -13,10 +13,14 @@ import type { Message } from "@/lib/types";
 
 function Thinking({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center gap-2 text-[13.5px] text-muted-foreground">
+    <span className="text-muted-foreground inline-flex items-center gap-2 text-[13.5px]">
       <span className="flex gap-1" aria-hidden>
         {[0, 1, 2].map((i) => (
-          <span key={i} className="size-1.5 animate-pulse-dot rounded-full bg-primary" style={{ animationDelay: `${i * 160}ms` }} />
+          <span
+            key={i}
+            className="animate-pulse-dot bg-primary size-1.5 rounded-full"
+            style={{ animationDelay: `${i * 160}ms` }}
+          />
         ))}
       </span>
       {label}
@@ -56,9 +60,20 @@ export function Thread({
                 </Button>
               </div>
             ) : pending.text ? (
-              <AnswerBody text={pending.text} workspace={workspace} sources={pending.sources} streaming />
+              <AnswerBody
+                text={pending.text}
+                workspace={workspace}
+                sources={pending.sources}
+                streaming
+              />
             ) : (
-              <Thinking label={pending.status === "retrieving" ? "Searching your documents" : "Writing the answer"} />
+              <Thinking
+                label={
+                  pending.status === "retrieving"
+                    ? "Searching your documents"
+                    : "Writing the answer"
+                }
+              />
             )}
             {pending.sources.length && pending.status !== "error" ? (
               <SourcesPanel workspace={workspace} sources={pending.sources} citations={[]} />

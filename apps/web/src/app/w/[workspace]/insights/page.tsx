@@ -10,18 +10,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { EmptyState, ErrorNotice, Skeleton } from "@/components/ui/feedback";
 import { NativeSelect } from "@/components/ui/input";
 import { PageBody, PageHeader } from "@/components/ui/page";
-import { formatBytes, formatCompact, formatDuration, formatNumber, formatPercent } from "@/lib/format";
+import {
+  formatBytes,
+  formatCompact,
+  formatDuration,
+  formatNumber,
+  formatPercent,
+} from "@/lib/format";
 import { useInsights } from "@/lib/queries";
 
-function Kpi({ icon, label, value, detail }: { icon: ReactNode; label: string; value: string; detail: string }) {
+function Kpi({
+  icon,
+  label,
+  value,
+  detail,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+  detail: string;
+}) {
   return (
     <Card className="px-5 py-4">
-      <div className="flex items-center gap-2 text-[12.5px] font-medium text-muted-foreground [&_svg]:size-4 [&_svg]:text-primary">
+      <div className="text-muted-foreground [&_svg]:text-primary flex items-center gap-2 text-[12.5px] font-medium [&_svg]:size-4">
         {icon}
         {label}
       </div>
-      <p className="mt-2 text-[26px] font-semibold tabular-nums tracking-tight">{value}</p>
-      <p className="mt-0.5 text-xs text-muted-foreground">{detail}</p>
+      <p className="mt-2 text-[26px] font-semibold tracking-tight tabular-nums">{value}</p>
+      <p className="text-muted-foreground mt-0.5 text-xs">{detail}</p>
     </Card>
   );
 }
@@ -39,7 +55,12 @@ export default function InsightsPage() {
         title="Insights"
         description="What people ask, what it costs, and how much retrieval and caching save."
         actions={
-          <NativeSelect value={days} onChange={(e) => setDays(Number(e.target.value))} className="w-36" aria-label="Time range">
+          <NativeSelect
+            value={days}
+            onChange={(e) => setDays(Number(e.target.value))}
+            className="w-36"
+            aria-label="Time range"
+          >
             <option value={7}>Last 7 days</option>
             <option value={14}>Last 14 days</option>
             <option value={30}>Last 30 days</option>
@@ -87,11 +108,17 @@ export default function InsightsPage() {
               <CardHeader>
                 <div>
                   <CardTitle>Document tokens per day</CardTitle>
-                  <CardDescription>What retrieval sent, against pasting every document in scope.</CardDescription>
+                  <CardDescription>
+                    What retrieval sent, against pasting every document in scope.
+                  </CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
-                {data.totals.questions ? <TokensChart daily={data.daily} /> : <EmptyState title="No questions yet" />}
+                {data.totals.questions ? (
+                  <TokensChart daily={data.daily} />
+                ) : (
+                  <EmptyState title="No questions yet" />
+                )}
               </CardContent>
             </Card>
             <Card>
@@ -102,7 +129,11 @@ export default function InsightsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {data.totals.questions ? <QuestionsChart daily={data.daily} /> : <EmptyState title="No questions yet" />}
+                {data.totals.questions ? (
+                  <QuestionsChart daily={data.daily} />
+                ) : (
+                  <EmptyState title="No questions yet" />
+                )}
               </CardContent>
             </Card>
           </div>
@@ -120,13 +151,21 @@ export default function InsightsPage() {
                     {data.top_documents.map((doc) => (
                       <li key={doc.document_id}>
                         <div className="mb-1 flex items-center justify-between gap-3 text-[13px]">
-                          <Link href={`/w/${workspace}/documents/${doc.document_id}`} className="truncate font-medium hover:text-primary">
+                          <Link
+                            href={`/w/${workspace}/documents/${doc.document_id}`}
+                            className="hover:text-primary truncate font-medium"
+                          >
                             {doc.title}
                           </Link>
-                          <span className="tabular-nums text-muted-foreground">{formatNumber(doc.citations)}</span>
+                          <span className="text-muted-foreground tabular-nums">
+                            {formatNumber(doc.citations)}
+                          </span>
                         </div>
-                        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                          <div className="h-full rounded-full bg-primary" style={{ width: `${(doc.citations / maxCitations) * 100}%` }} />
+                        <div className="bg-muted h-1.5 overflow-hidden rounded-full">
+                          <div
+                            className="bg-primary h-full rounded-full"
+                            style={{ width: `${(doc.citations / maxCitations) * 100}%` }}
+                          />
                         </div>
                       </li>
                     ))}
@@ -146,15 +185,21 @@ export default function InsightsPage() {
               <CardContent>
                 <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-[13px]">
                   {[
-                    ["Documents ready", `${formatNumber(data.library.ready)} of ${formatNumber(data.library.documents)}`],
+                    [
+                      "Documents ready",
+                      `${formatNumber(data.library.ready)} of ${formatNumber(data.library.documents)}`,
+                    ],
                     ["Indexed passages", formatNumber(data.library.chunks)],
                     ["Indexed tokens", formatNumber(data.library.tokens)],
                     ["Storage", formatBytes(data.library.bytes)],
-                    ["Answering", data.generator === "extractive" ? "Local extractive" : data.generator],
+                    [
+                      "Answering",
+                      data.generator === "extractive" ? "Local extractive" : data.generator,
+                    ],
                     ["Embeddings", data.embeddings],
                   ].map(([label, value]) => (
                     <div key={label}>
-                      <dt className="text-xs text-muted-foreground">{label}</dt>
+                      <dt className="text-muted-foreground text-xs">{label}</dt>
                       <dd className="mt-0.5 truncate font-medium">{value}</dd>
                     </div>
                   ))}

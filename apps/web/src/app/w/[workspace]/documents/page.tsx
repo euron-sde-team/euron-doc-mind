@@ -16,8 +16,8 @@ import { canEdit, useCurrentWorkspace, useDocuments, useLibraryStats } from "@/l
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="px-4 py-3">
-      <p className="text-[11.5px] font-medium uppercase tracking-wider text-subtle">{label}</p>
-      <p className="mt-1 text-lg font-semibold tabular-nums tracking-tight">{value}</p>
+      <p className="text-subtle text-[11.5px] font-medium tracking-wider uppercase">{label}</p>
+      <p className="mt-1 text-lg font-semibold tracking-tight tabular-nums">{value}</p>
     </div>
   );
 }
@@ -53,26 +53,47 @@ export default function DocumentsPage() {
           ) : null
         }
       />
-      <div className="mb-5 grid grid-cols-2 divide-x divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm sm:grid-cols-4">
+      <div className="divide-border border-border bg-card mb-5 grid grid-cols-2 divide-x overflow-hidden rounded-xl border shadow-sm sm:grid-cols-4">
         <Stat label="Documents" value={stats.data ? formatNumber(stats.data.documents) : "..."} />
         <Stat label="Ready" value={stats.data ? formatNumber(stats.data.ready) : "..."} />
-        <Stat label="Indexed tokens" value={stats.data ? formatCompact(stats.data.tokens) : "..."} />
+        <Stat
+          label="Indexed tokens"
+          value={stats.data ? formatCompact(stats.data.tokens) : "..."}
+        />
         <Stat label="Storage" value={stats.data ? formatBytes(stats.data.bytes) : "..."} />
       </div>
-      {editable && (items.length > 0 || filtering) ? <UploadZone workspace={workspace} compact /> : null}
-      <div className="mb-3 mt-5 flex flex-wrap items-center gap-2">
+      {editable && (items.length > 0 || filtering) ? (
+        <UploadZone workspace={workspace} compact />
+      ) : null}
+      <div className="mt-5 mb-3 flex flex-wrap items-center gap-2">
         <div className="relative min-w-56 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by title or file name" className="pl-9" aria-label="Filter documents" />
+          <Search className="text-subtle pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Filter by title or file name"
+            className="pl-9"
+            aria-label="Filter documents"
+          />
         </div>
-        <NativeSelect value={status} onChange={(e) => setStatus(e.target.value)} className="w-40" aria-label="Status">
+        <NativeSelect
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="w-40"
+          aria-label="Status"
+        >
           <option value="">All statuses</option>
           <option value="ready">Ready</option>
           <option value="processing">Indexing</option>
           <option value="queued">Queued</option>
           <option value="failed">Failed</option>
         </NativeSelect>
-        <NativeSelect value={kind} onChange={(e) => setKind(e.target.value)} className="w-40" aria-label="File type">
+        <NativeSelect
+          value={kind}
+          onChange={(e) => setKind(e.target.value)}
+          className="w-40"
+          aria-label="File type"
+        >
           <option value="">All types</option>
           <option value="pdf">PDF</option>
           <option value="docx">Word</option>
@@ -94,11 +115,19 @@ export default function DocumentsPage() {
       ) : items.length ? (
         <DocumentsTable workspace={workspace} documents={items} canEdit={editable} />
       ) : filtering ? (
-        <EmptyState icon={<Search />} title="No documents match" description="Try a different filter." />
+        <EmptyState
+          icon={<Search />}
+          title="No documents match"
+          description="Try a different filter."
+        />
       ) : editable ? (
         <UploadZone workspace={workspace} />
       ) : (
-        <EmptyState icon={<Files />} title="No documents yet" description="An editor or owner can upload files here." />
+        <EmptyState
+          icon={<Files />}
+          title="No documents yet"
+          description="An editor or owner can upload files here."
+        />
       )}
     </PageBody>
   );

@@ -30,7 +30,13 @@ export function GeneralPanel({ workspace, editable }: { workspace: Workspace; ed
         <form onSubmit={submit} className="max-w-xl space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="settings-name">Name</Label>
-            <Input id="settings-name" value={name} onChange={(e) => setName(e.target.value)} disabled={!editable} required />
+            <Input
+              id="settings-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={!editable}
+              required
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="settings-description">Description</Label>
@@ -44,8 +50,8 @@ export function GeneralPanel({ workspace, editable }: { workspace: Workspace; ed
           <div className="space-y-1.5">
             <Label>Address</Label>
             <FieldHint>
-              This workspace lives at <code className="font-mono">/w/{workspace.slug}</code>. API calls accept the slug or the id{" "}
-              <code className="font-mono">{workspace.id}</code>.
+              This workspace lives at <code className="font-mono">/w/{workspace.slug}</code>. API
+              calls accept the slug or the id <code className="font-mono">{workspace.id}</code>.
             </FieldHint>
           </div>
           {editable ? (

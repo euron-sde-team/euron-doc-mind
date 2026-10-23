@@ -35,7 +35,15 @@ export function useChatStream(workspace: string) {
       const now = new Date().toISOString();
       client.setQueryData<Message[]>(messagesKey, (old = []) => [
         ...old,
-        { id: `pending-${now}`, role: "user", content: question, citations: [], sources: [], usage: null, created_at: now },
+        {
+          id: `pending-${now}`,
+          role: "user",
+          content: question,
+          citations: [],
+          sources: [],
+          usage: null,
+          created_at: now,
+        },
       ]);
       setPending({ question, text: "", sources: [], status: "retrieving" });
       let finished = false;
@@ -46,9 +54,13 @@ export function useChatStream(workspace: string) {
           (event) => {
             const data = JSON.parse(event.data) as Record<string, unknown>;
             if (event.event === "sources") {
-              setPending((p) => p && { ...p, sources: data.sources as Source[], status: "answering" });
+              setPending(
+                (p) => p && { ...p, sources: data.sources as Source[], status: "answering" },
+              );
             } else if (event.event === "delta") {
-              setPending((p) => p && { ...p, text: p.text + String(data.text ?? ""), status: "answering" });
+              setPending(
+                (p) => p && { ...p, text: p.text + String(data.text ?? ""), status: "answering" },
+              );
             } else if (event.event === "done") {
               finished = true;
               const message = data.message as Message;
@@ -56,7 +68,9 @@ export function useChatStream(workspace: string) {
               setPending(null);
             } else if (event.event === "error") {
               const error = (data.error ?? {}) as { message?: string };
-              setPending((p) => p && { ...p, status: "error", error: error.message ?? "The answer failed." });
+              setPending(
+                (p) => p && { ...p, status: "error", error: error.message ?? "The answer failed." },
+              );
             }
           },
           controller.signal,
@@ -73,7 +87,9 @@ export function useChatStream(workspace: string) {
         }
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
-          setPending((p) => p && { ...p, status: "error", error: "The connection to the API was lost." });
+          setPending(
+            (p) => p && { ...p, status: "error", error: "The connection to the API was lost." },
+          );
         }
       } finally {
         void client.invalidateQueries({ queryKey: qk.conversations(workspace) });

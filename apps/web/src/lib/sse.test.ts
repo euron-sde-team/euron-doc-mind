@@ -14,8 +14,10 @@ describe("SseParser", () => {
 
   it("buffers events split across chunks and normalises CRLF", () => {
     const parser = new SseParser();
-    expect(parser.push("event: sources\r\ndata: {\"sou")).toEqual([]);
-    expect(parser.push('rces":[]}\r\n\r\n')).toEqual([{ event: "sources", data: '{"sources":[]}' }]);
+    expect(parser.push('event: sources\r\ndata: {"sou')).toEqual([]);
+    expect(parser.push('rces":[]}\r\n\r\n')).toEqual([
+      { event: "sources", data: '{"sources":[]}' },
+    ]);
   });
 
   it("ignores keep-alive comments and joins multi-line data", () => {

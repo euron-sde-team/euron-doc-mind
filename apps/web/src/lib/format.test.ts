@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { formatBytes, formatCompact, formatDuration, formatPercent, formatRelative, initials } from "@/lib/format";
+import {
+  formatBytes,
+  formatCompact,
+  formatDuration,
+  formatPercent,
+  formatRelative,
+  initials,
+} from "@/lib/format";
 
 describe("formatters", () => {
   it("formats sizes, ratios and durations", () => {

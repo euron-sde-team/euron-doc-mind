@@ -87,7 +87,12 @@ export function DocumentActions({
       <Dialog open={dialog === "rename"} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogContent title="Rename document">
           <form onSubmit={rename}>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={300} autoFocus />
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={300}
+              autoFocus
+            />
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={() => setDialog(null)}>
                 Cancel

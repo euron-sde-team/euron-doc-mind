@@ -17,7 +17,10 @@ describe("snippetRuns", () => {
   });
 
   it("treats HTML in documents as plain text", () => {
-    expect(snippetRuns(`<script>x</script> ${S}hit${E}`)[0]).toEqual({ text: "<script>x</script> ", match: false });
+    expect(snippetRuns(`<script>x</script> ${S}hit${E}`)[0]).toEqual({
+      text: "<script>x</script> ",
+      match: false,
+    });
   });
 
   it("tolerates an unterminated match", () => {

@@ -11,7 +11,8 @@ import type { AuditEvent } from "@/lib/types";
 const LABELS: Record<string, (e: AuditEvent) => string> = {
   "workspace.created": () => "created the workspace",
   "workspace.updated": () => "updated workspace settings",
-  "member.added": (e) => `added ${String(e.details.email ?? "a member")} as ${String(e.details.role ?? "member")}`,
+  "member.added": (e) =>
+    `added ${String(e.details.email ?? "a member")} as ${String(e.details.role ?? "member")}`,
   "member.role_changed": (e) => `changed a member's role to ${String(e.details.role ?? "")}`,
   "member.removed": () => "removed a member",
   "document.uploaded": (e) => `uploaded ${String(e.details.filename ?? "a document")}`,
@@ -31,14 +32,19 @@ export function ActivityPanel({ workspace }: { workspace: string }) {
   return (
     <Card>
       {events.length ? (
-        <ol className="divide-y divide-border">
+        <ol className="divide-border divide-y">
           {events.map((event) => (
-            <li key={event.id} className="flex items-start justify-between gap-4 px-5 py-3 text-[13px]">
+            <li
+              key={event.id}
+              className="flex items-start justify-between gap-4 px-5 py-3 text-[13px]"
+            >
               <p>
                 <span className="font-medium">{event.actor_name ?? "An API key"}</span>{" "}
-                <span className="text-muted-foreground">{(LABELS[event.action] ?? (() => event.action))(event)}</span>
+                <span className="text-muted-foreground">
+                  {(LABELS[event.action] ?? (() => event.action))(event)}
+                </span>
               </p>
-              <time dateTime={event.created_at} className="shrink-0 text-xs text-subtle">
+              <time dateTime={event.created_at} className="text-subtle shrink-0 text-xs">
                 {formatRelative(event.created_at)}
               </time>
             </li>

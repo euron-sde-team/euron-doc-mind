@@ -1,6 +1,15 @@
 "use client";
 
-import { BarChart3, Files, Menu, MessageSquarePlus, MessagesSquare, Search, Settings, X } from "lucide-react";
+import {
+  BarChart3,
+  Files,
+  Menu,
+  MessageSquarePlus,
+  MessagesSquare,
+  Search,
+  Settings,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
@@ -38,8 +47,8 @@ function Sidebar({
   const pathname = usePathname();
   const base = `/w/${current.slug}`;
   return (
-    <div className="flex h-full w-64 flex-col border-r border-sidebar-border bg-sidebar">
-      <div className="px-3 pb-2 pt-3">
+    <div className="border-sidebar-border bg-sidebar flex h-full w-64 flex-col border-r">
+      <div className="px-3 pt-3 pb-2">
         <WorkspaceSwitcher current={current} all={me.workspaces} />
       </div>
       <div className="px-3">
@@ -61,7 +70,9 @@ function Sidebar({
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13.5px] transition-colors [&_svg]:size-4",
-                active ? "bg-card font-medium text-foreground shadow-sm ring-1 ring-border" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                active
+                  ? "bg-card text-foreground ring-border font-medium shadow-sm ring-1"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
               <Icon className={active ? "text-primary" : ""} />
@@ -71,12 +82,14 @@ function Sidebar({
         })}
       </nav>
       <div className="mt-5 flex min-h-0 flex-1 flex-col">
-        <p className="px-5 pb-1.5 text-[11px] font-medium uppercase tracking-wider text-subtle">Recent</p>
+        <p className="text-subtle px-5 pb-1.5 text-[11px] font-medium tracking-wider uppercase">
+          Recent
+        </p>
         <div className="scroll-quiet min-h-0 flex-1 overflow-y-auto px-3 pb-3">
           <ConversationList workspace={current.slug} onNavigate={onNavigate} />
         </div>
       </div>
-      <div className="border-t border-sidebar-border p-3">
+      <div className="border-sidebar-border border-t p-3">
         <UserMenu user={me.user} />
       </div>
     </div>
@@ -107,7 +120,12 @@ export function AppShell({ workspace, children }: { workspace: string; children:
     );
   }
   if (me.error || !me.data) {
-    return <EmptyState title="DocMind is unreachable" description={me.error?.message ?? "Try again shortly."} />;
+    return (
+      <EmptyState
+        title="DocMind is unreachable"
+        description={me.error?.message ?? "Try again shortly."}
+      />
+    );
   }
   if (!current) {
     return (
@@ -131,15 +149,25 @@ export function AppShell({ workspace, children }: { workspace: string; children:
       </aside>
       {drawer ? (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <button type="button" aria-label="Close menu" className="absolute inset-0 bg-black/40" onClick={() => setDrawer(false)} />
-          <div className="relative h-full w-64 animate-fade-in">
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setDrawer(false)}
+          />
+          <div className="animate-fade-in relative h-full w-64">
             <Sidebar me={me.data} current={current} onNavigate={() => setDrawer(false)} />
           </div>
         </div>
       ) : null}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-12 items-center justify-between border-b border-border px-3 lg:hidden">
-          <Button variant="ghost" size="icon-sm" aria-label="Open menu" onClick={() => setDrawer(true)}>
+        <header className="border-border flex h-12 items-center justify-between border-b px-3 lg:hidden">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label="Open menu"
+            onClick={() => setDrawer(true)}
+          >
             {drawer ? <X /> : <Menu />}
           </Button>
           <Wordmark name={runtimeEnv().productName} className="[&_svg]:size-6" />

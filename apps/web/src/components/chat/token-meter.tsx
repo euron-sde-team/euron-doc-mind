@@ -12,27 +12,32 @@ export function TokenMeter({ usage }: { usage: Usage }) {
   const cached = usage.cache !== "miss";
   const used = cached ? 0 : usage.context_tokens;
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted-foreground">
+    <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px]">
       <Tooltip
         content={`Answering used ${formatNumber(used)} document tokens. Pasting every document in scope would have sent ${formatNumber(usage.baseline_tokens)}.`}
       >
         <span className="inline-flex items-center gap-1.5">
           <Gauge className="size-3.5" />
           <span>
-            <span className="font-medium text-foreground">{formatNumber(used)}</span> of {formatNumber(usage.baseline_tokens)} tokens
+            <span className="text-foreground font-medium">{formatNumber(used)}</span> of{" "}
+            {formatNumber(usage.baseline_tokens)} tokens
           </span>
-          <span className="relative ml-0.5 h-1.5 w-16 overflow-hidden rounded-full bg-muted" aria-hidden>
+          <span
+            className="bg-muted relative ml-0.5 h-1.5 w-16 overflow-hidden rounded-full"
+            aria-hidden
+          >
             <span
-              className="absolute inset-y-0 left-0 rounded-full bg-primary"
+              className="bg-primary absolute inset-y-0 left-0 rounded-full"
               style={{ width: `${Math.max(3, (1 - usage.saved_ratio) * 100)}%` }}
             />
           </span>
-          <span className="font-medium text-success">{formatPercent(usage.saved_ratio)} saved</span>
+          <span className="text-success font-medium">{formatPercent(usage.saved_ratio)} saved</span>
         </span>
       </Tooltip>
       {cached ? (
-        <span className="inline-flex items-center gap-1 font-medium text-primary">
-          <Zap className="size-3.5" /> {usage.cache === "exact" ? "Cached answer" : "Similar question, cached"}
+        <span className="text-primary inline-flex items-center gap-1 font-medium">
+          <Zap className="size-3.5" />{" "}
+          {usage.cache === "exact" ? "Cached answer" : "Similar question, cached"}
         </span>
       ) : null}
       <span className="inline-flex items-center gap-1">

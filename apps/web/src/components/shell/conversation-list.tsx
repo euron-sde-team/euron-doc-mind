@@ -20,7 +20,13 @@ import { cn } from "@/lib/cn";
 import { useConversationActions, useConversations } from "@/lib/queries";
 import type { Conversation } from "@/lib/types";
 
-export function ConversationList({ workspace, onNavigate }: { workspace: string; onNavigate?: () => void }) {
+export function ConversationList({
+  workspace,
+  onNavigate,
+}: {
+  workspace: string;
+  onNavigate?: () => void;
+}) {
   const conversations = useConversations(workspace);
   const pathname = usePathname();
   const router = useRouter();
@@ -38,7 +44,7 @@ export function ConversationList({ workspace, onNavigate }: { workspace: string;
   }
   const items = conversations.data ?? [];
   if (!items.length) {
-    return <p className="px-3 py-2 text-[12.5px] text-subtle">No conversations yet.</p>;
+    return <p className="text-subtle px-3 py-2 text-[12.5px]">No conversations yet.</p>;
   }
 
   return (
@@ -53,8 +59,10 @@ export function ConversationList({ workspace, onNavigate }: { workspace: string;
                 href={href}
                 onClick={onNavigate}
                 className={cn(
-                  "block truncate rounded-lg py-1.5 pl-3 pr-8 text-[13px] transition-colors",
-                  active ? "bg-accent font-medium text-accent-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  "block truncate rounded-lg py-1.5 pr-8 pl-3 text-[13px] transition-colors",
+                  active
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
                 title={conversation.title}
               >
@@ -65,7 +73,7 @@ export function ConversationList({ workspace, onNavigate }: { workspace: string;
                   <button
                     type="button"
                     aria-label={`Actions for ${conversation.title}`}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-1 text-subtle opacity-0 transition-opacity hover:bg-card hover:text-foreground focus-visible:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
+                    className="text-subtle hover:bg-card hover:text-foreground absolute top-1/2 right-1 -translate-y-1/2 rounded-md p-1 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100"
                   >
                     <MoreHorizontal className="size-4" />
                   </button>
@@ -128,9 +136,17 @@ function RenameDialog({
         if (!next) onClose();
       }}
     >
-      <DialogContent title="Rename conversation" onOpenAutoFocus={() => conversation && setTitle(conversation.title)}>
+      <DialogContent
+        title="Rename conversation"
+        onOpenAutoFocus={() => conversation && setTitle(conversation.title)}
+      >
         <form onSubmit={submit}>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} autoFocus />
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={200}
+            autoFocus
+          />
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={onClose}>
               Cancel

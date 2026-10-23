@@ -13,11 +13,25 @@ import { useSystemInfo, useUpdateWorkspace } from "@/lib/queries";
 import type { Workspace, WorkspaceSettings } from "@/lib/types";
 
 const MODES: { value: WorkspaceSettings["answer_mode"]; title: string; text: string }[] = [
-  { value: "auto", title: "Best available", text: "Use the configured model; fall back to extractive answers when there is none." },
-  { value: "extractive", title: "Extractive only", text: "Never call a model. Answers are built from your documents' own sentences." },
+  {
+    value: "auto",
+    title: "Best available",
+    text: "Use the configured model; fall back to extractive answers when there is none.",
+  },
+  {
+    value: "extractive",
+    title: "Extractive only",
+    text: "Never call a model. Answers are built from your documents' own sentences.",
+  },
 ];
 
-export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; editable: boolean }) {
+export function AnsweringPanel({
+  workspace,
+  editable,
+}: {
+  workspace: Workspace;
+  editable: boolean;
+}) {
   const system = useSystemInfo();
   const update = useUpdateWorkspace(workspace.slug);
   const [settings, setSettings] = useState<WorkspaceSettings>(workspace.settings);
@@ -40,7 +54,9 @@ export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; 
         <CardHeader>
           <div>
             <CardTitle>How answers are written</CardTitle>
-            <CardDescription>Applies to every conversation and API call in this workspace.</CardDescription>
+            <CardDescription>
+              Applies to every conversation and API call in this workspace.
+            </CardDescription>
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -55,18 +71,25 @@ export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; 
                 onClick={() => set("answer_mode", mode.value)}
                 className={cn(
                   "rounded-xl border p-4 text-left transition-colors disabled:cursor-not-allowed",
-                  settings.answer_mode === mode.value ? "border-primary bg-accent/50 ring-1 ring-primary/30" : "border-border hover:bg-muted/50",
+                  settings.answer_mode === mode.value
+                    ? "border-primary bg-accent/50 ring-primary/30 ring-1"
+                    : "border-border hover:bg-muted/50",
                 )}
               >
                 <span className="text-[13.5px] font-semibold">{mode.title}</span>
-                <span className="mt-1 block text-[12.5px] text-muted-foreground">{mode.text}</span>
+                <span className="text-muted-foreground mt-1 block text-[12.5px]">{mode.text}</span>
               </button>
             ))}
           </div>
           <div className="grid gap-5 sm:grid-cols-3">
             <div className="space-y-1.5">
               <Label htmlFor="top-k">Passages per answer</Label>
-              <NativeSelect id="top-k" value={settings.top_k} disabled={!editable} onChange={(e) => set("top_k", Number(e.target.value))}>
+              <NativeSelect
+                id="top-k"
+                value={settings.top_k}
+                disabled={!editable}
+                onChange={(e) => set("top_k", Number(e.target.value))}
+              >
                 {[3, 4, 6, 8, 10, 12].map((n) => (
                   <option key={n} value={n}>
                     {n}
@@ -80,7 +103,9 @@ export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; 
                 id="budget"
                 value={settings.context_token_budget ?? ""}
                 disabled={!editable}
-                onChange={(e) => set("context_token_budget", e.target.value ? Number(e.target.value) : null)}
+                onChange={(e) =>
+                  set("context_token_budget", e.target.value ? Number(e.target.value) : null)
+                }
               >
                 <option value="">Deployment default</option>
                 {[1000, 1800, 3000, 6000, 12000].map((n) => (
@@ -96,7 +121,9 @@ export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; 
                 id="chunks"
                 value={settings.chunk_tokens ?? ""}
                 disabled={!editable}
-                onChange={(e) => set("chunk_tokens", e.target.value ? Number(e.target.value) : null)}
+                onChange={(e) =>
+                  set("chunk_tokens", e.target.value ? Number(e.target.value) : null)
+                }
               >
                 <option value="">Deployment default</option>
                 {[200, 320, 500, 800].map((n) => (
@@ -108,12 +135,19 @@ export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; 
               <FieldHint>Applies to new uploads; reprocess older files to apply it.</FieldHint>
             </div>
           </div>
-          <div className="flex items-center justify-between gap-4 rounded-xl border border-border px-4 py-3">
+          <div className="border-border flex items-center justify-between gap-4 rounded-xl border px-4 py-3">
             <div>
               <Label htmlFor="cache">Answer cache</Label>
-              <FieldHint>Reuse answers for the same or a near-identical question until the documents change.</FieldHint>
+              <FieldHint>
+                Reuse answers for the same or a near-identical question until the documents change.
+              </FieldHint>
             </div>
-            <Switch id="cache" checked={settings.cache_enabled} disabled={!editable} onCheckedChange={(v) => set("cache_enabled", v)} />
+            <Switch
+              id="cache"
+              checked={settings.cache_enabled}
+              disabled={!editable}
+              onCheckedChange={(v) => set("cache_enabled", v)}
+            />
           </div>
           {editable ? (
             <Button onClick={save} disabled={update.isPending}>
@@ -126,26 +160,36 @@ export function AnsweringPanel({ workspace, editable }: { workspace: Workspace; 
         <CardHeader>
           <div>
             <CardTitle>This deployment</CardTitle>
-            <CardDescription>Configured by the operator through environment variables.</CardDescription>
+            <CardDescription>
+              Configured by the operator through environment variables.
+            </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
           <dl className="grid gap-4 text-[13px] sm:grid-cols-3">
             <div className="space-y-0.5">
-              <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Cpu className="size-3.5 text-primary" aria-hidden /> Answer model
+              <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <Cpu className="text-primary size-3.5" aria-hidden /> Answer model
               </dt>
-              <dd className="font-medium">{generator ? (generator.uses_model ? `${generator.provider} / ${generator.model}` : "Local extractive (no model)") : "..."}</dd>
+              <dd className="font-medium">
+                {generator
+                  ? generator.uses_model
+                    ? `${generator.provider} / ${generator.model}`
+                    : "Local extractive (no model)"
+                  : "..."}
+              </dd>
             </div>
             <div className="space-y-0.5">
-              <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <ScanSearch className="size-3.5 text-primary" aria-hidden /> Embeddings
+              <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <ScanSearch className="text-primary size-3.5" aria-hidden /> Embeddings
               </dt>
-              <dd className="font-medium">{system.data ? `${system.data.embeddings} (${system.data.embedding_dim}d)` : "..."}</dd>
+              <dd className="font-medium">
+                {system.data ? `${system.data.embeddings} (${system.data.embedding_dim}d)` : "..."}
+              </dd>
             </div>
             <div className="space-y-0.5">
-              <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Database className="size-3.5 text-primary" aria-hidden /> Tokenizer
+              <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
+                <Database className="text-primary size-3.5" aria-hidden /> Tokenizer
               </dt>
               <dd className="font-medium">{system.data?.tokenizer ?? "..."}</dd>
             </div>

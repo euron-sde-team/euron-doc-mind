@@ -34,8 +34,8 @@ export function CitationChip({
   const chip = (
     <span
       className={cn(
-        "mx-0.5 inline-flex h-[18px] min-w-[18px] -translate-y-px items-center justify-center rounded-md bg-accent px-1 align-middle font-mono text-[10.5px] font-semibold text-accent-foreground",
-        target && "cursor-pointer transition-colors hover:bg-primary hover:text-primary-foreground",
+        "bg-accent text-accent-foreground mx-0.5 inline-flex h-[18px] min-w-[18px] -translate-y-px items-center justify-center rounded-md px-1 align-middle font-mono text-[10.5px] font-semibold",
+        target && "hover:bg-primary hover:text-primary-foreground cursor-pointer transition-colors",
       )}
     >
       {n}
@@ -46,28 +46,32 @@ export function CitationChip({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" aria-label={`Source ${n}: ${target.document_title}, ${target.location}`} className="inline">
+        <button
+          type="button"
+          aria-label={`Source ${n}: ${target.document_title}, ${target.location}`}
+          className="inline"
+        >
           {chip}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-[22rem]">
         <div className="flex items-start gap-2.5">
-          <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+          <span className="bg-accent text-accent-foreground mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg">
             <FileText className="size-3.5" />
           </span>
           <div className="min-w-0">
             <p className="truncate text-[13px] font-semibold">{target.document_title}</p>
-            <p className="text-xs text-muted-foreground">{target.location}</p>
+            <p className="text-muted-foreground text-xs">{target.location}</p>
           </div>
         </div>
         {quote ? (
-          <blockquote className="mt-3 border-l-2 border-primary/60 pl-3 text-[13px] leading-relaxed text-foreground/90">
+          <blockquote className="border-primary/60 text-foreground/90 mt-3 border-l-2 pl-3 text-[13px] leading-relaxed">
             {quote}
           </blockquote>
         ) : null}
         <Link
           href={viewerHref(workspace, target)}
-          className="mt-3 inline-flex items-center gap-1 text-[13px] font-medium text-primary hover:underline"
+          className="text-primary mt-3 inline-flex items-center gap-1 text-[13px] font-medium hover:underline"
         >
           Open in document <ArrowUpRight className="size-3.5" />
         </Link>
