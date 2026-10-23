@@ -1,0 +1,104 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: "api: lint, typecheck, unit tests, OpenAPI"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run pytest tests/unit -q
+      - name: OpenAPI reference matches the routes
+        run: |
+          uv run docmind openapi --out /tmp/openapi.json
+          diff -u ../../docs/api/openapi.json /tmp/openapi.json
+
+  web:
+    name: "web: lint, typecheck, unit tests, build"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm format:check
+      - run: pnpm test
+      - run: pnpm build
+      - name: Sanitization scan
+        run: scripts/check-sanitization.sh
+
+  integration:
+    name: integration tests (Postgres, Valkey, Floci)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.7-pg16-bookworm
+        env:
+          POSTGRES_USER: docmind
+          POSTGRES_PASSWORD: docmind
+          POSTGRES_DB: docmind
+        ports: ["5451:5432"]
+        options: >-
+          --health-cmd "pg_isready -U docmind -d docmind"
+          --health-interval 3s --health-timeout 3s --health-retries 30
+      valkey:
+        image: valkey/valkey:8.1-alpine
+        ports: ["6411:6379"]
+        options: >-
+          --health-cmd "valkey-cli ping"
+          --health-interval 3s --health-timeout 3s --health-retries 30
+      floci:
+        image: floci/floci:2.3.0
+        env:
+          FLOCI_DEFAULT_REGION: us-east-1
+        ports: ["4611:4566"]
+    env:
+      TEST_DATABASE_ADMIN_URL: postgresql://docmind:docmind@localhost:5451/docmind
+      TEST_REDIS_URL: redis://localhost:6411/15
+      TEST_AWS_ENDPOINT_URL: http://localhost:4611
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: apps/api/uv.lock
+      - run: uv sync --frozen
+      - name: Wait for the AWS emulator
+        run: |
+          for i in $(seq 1 60); do
+            curl -fsS -o /dev/null http://localhost:4611/ && exit 0
+            sleep 2
+          done
+          echo "floci did not start" && exit 1
+      - run: uv run pytest tests/integration -m integration -q
