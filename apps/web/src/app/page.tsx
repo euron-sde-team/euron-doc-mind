@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/feedback";
 import { ApiError } from "@/lib/api";
 import { useMe } from "@/lib/queries";
 import { LAST_WORKSPACE_KEY, readLocal } from "@/lib/storage";
+import { pickWorkspace } from "@/lib/workspace-choice";
 
 export default function Home() {
   const router = useRouter();
@@ -18,9 +19,7 @@ export default function Home() {
       return;
     }
     if (!me.data) return;
-    const last = readLocal(LAST_WORKSPACE_KEY);
-    const slugs = me.data.workspaces.map((w) => w.slug);
-    const target = last && slugs.includes(last) ? last : slugs[0];
+    const target = pickWorkspace(me.data.workspaces, readLocal(LAST_WORKSPACE_KEY));
     router.replace(target ? `/w/${target}/chat` : "/welcome");
   }, [me.data, me.error, router]);
 
