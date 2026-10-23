@@ -102,6 +102,12 @@ class ServiceUnavailableError(AppError):
     message = "A dependency is unavailable."
 
 
+class InternalError(AppError):
+    status_code = 500
+    code = "internal_error"
+    message = "Something went wrong on our side."
+
+
 def error_body(code: str, message: str, details: Any = None) -> dict[str, Any]:
     error: dict[str, Any] = {"code": code, "message": message, "request_id": get_request_id()}
     if details is not None:

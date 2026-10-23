@@ -14,7 +14,7 @@ from __future__ import annotations
 import time
 import uuid
 from collections.abc import AsyncIterator, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
@@ -57,6 +57,12 @@ NO_DOCUMENTS = (
 class ChatEvent:
     event: str
     data: dict[str, Any]
+    # The exception behind an "error" event, so a JSON response keeps its status code.
+    error: AppError | None = field(default=None, compare=False, repr=False)
+
+    @classmethod
+    def failure(cls, exc: AppError) -> ChatEvent:
+        return cls("error", error_body(exc.code, exc.message), exc)
 
 
 class ChatService:
@@ -220,7 +226,7 @@ class ChatService:
                         yield ChatEvent("delta", {"text": delta})
                 except AppError as exc:
                     log.warning("generation_failed", code=exc.code)
-                    yield ChatEvent("error", error_body(exc.code, exc.message))
+                    yield ChatEvent.failure(exc)
                     return
                 metrics.GENERATION_DURATION.labels(generator.label.split(":")[0]).observe(
                     time.perf_counter() - generation_started

@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, Query, status
 from fastapi.sse import EventSourceResponse, ServerSentEvent
 
 from docmind.api.deps import ContainerDep, SessionDep, ViewerDep, WorkspaceContext, rate_limit
-from docmind.core.errors import AppError, UpstreamError, error_body
+from docmind.core.errors import AppError, InternalError, NotFoundError, UpstreamError
 from docmind.core.logging import get_logger
 from docmind.models import Workspace
 from docmind.repositories.conversations import ConversationRepository
@@ -59,7 +59,7 @@ async def _events(
     async with container.db.session() as session:
         workspace = await session.get(Workspace, ctx.id)
         if workspace is None:
-            yield ChatEvent("error", error_body("not_found", "Workspace not found."))
+            yield ChatEvent.failure(NotFoundError("Workspace not found."))
             return
         conversation = None
         if conversation_id is not None:
@@ -67,7 +67,7 @@ async def _events(
                 ctx.id, conversation_id, ctx.principal.user_id or uuid.UUID(int=0)
             )
             if conversation is None:
-                yield ChatEvent("error", error_body("not_found", "Conversation not found."))
+                yield ChatEvent.failure(NotFoundError("Conversation not found."))
                 return
         try:
             async for event in ChatService(container, session).ask(
@@ -79,23 +79,16 @@ async def _events(
             ):
                 yield event
         except AppError as exc:
-            yield ChatEvent("error", error_body(exc.code, exc.message))
+            yield ChatEvent.failure(exc)
         except Exception:
             log.exception("answer_failed")
-            yield ChatEvent(
-                "error", error_body("internal_error", "Something went wrong on our side.")
-            )
+            yield ChatEvent.failure(InternalError())
 
 
 async def _collect(events: AsyncIterator[ChatEvent]) -> AnswerOut:
     async for event in events:
         if event.event == "error":
-            error = event.data["error"]
-            raise (
-                AppError(error["message"], code=error["code"])
-                if error["code"] != "upstream_error"
-                else UpstreamError(error["message"])
-            )
+            raise event.error or UpstreamError()
         if event.event == "done":
             return AnswerOut.model_validate(event.data)
     raise UpstreamError("The answer did not complete.")
