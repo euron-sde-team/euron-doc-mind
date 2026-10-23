@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 
 import pytest
 
@@ -11,7 +11,7 @@ from docmind.core.errors import NotFoundError, UnprocessableError, UpstreamError
 from docmind.services.chat import ChatEvent
 
 
-async def _stream(*events: ChatEvent) -> AsyncIterator[ChatEvent]:
+async def _stream(*events: ChatEvent) -> AsyncGenerator[ChatEvent]:
     for event in events:
         yield event
 
@@ -38,3 +38,17 @@ def test_error_events_carry_the_standard_envelope() -> None:
     assert event.data["error"]["code"] == "not_found"
     assert event.data["error"]["message"] == "Conversation not found."
 
+
+async def test_the_answer_stream_is_closed_even_when_it_ends_in_an_error() -> None:
+    closed = []
+
+    async def answer() -> AsyncGenerator[ChatEvent]:
+        try:
+            yield ChatEvent.failure(NotFoundError())
+            yield ChatEvent("done", {})
+        finally:
+            closed.append(True)
+
+    with pytest.raises(NotFoundError):
+        await _collect(answer())
+    assert closed == [True]

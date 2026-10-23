@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import time
 import uuid
-from collections.abc import AsyncIterator, Sequence
+from collections.abc import AsyncGenerator, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -158,7 +158,7 @@ class ChatService:
         *,
         conversation: Conversation | None = None,
         document_ids: Sequence[uuid.UUID] | None = None,
-    ) -> AsyncIterator[ChatEvent]:
+    ) -> AsyncGenerator[ChatEvent]:
         started = time.perf_counter()
         question = question.strip()
         prefs = WorkspaceSettings.model_validate(workspace.settings)

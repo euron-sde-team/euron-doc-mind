@@ -8,7 +8,8 @@ answer is produced.
 from __future__ import annotations
 
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator, AsyncIterator
+from contextlib import aclosing
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query, status
@@ -54,8 +55,13 @@ async def _events(
     ctx: WorkspaceContext,
     body: AskRequest,
     conversation_id: uuid.UUID | None,
-) -> AsyncIterator[ChatEvent]:
-    """Run one answer in its own session, so streaming never outlives the request's session."""
+) -> AsyncGenerator[ChatEvent]:
+    """Run one answer in its own session, so streaming never outlives the request's session.
+
+    Every consumer closes this generator explicitly (`aclosing`): an answer that ends early,
+    with an error or a disconnected client, must hand its connection back at once instead
+    of whenever the garbage collector gets to it.
+    """
     async with container.db.session() as session:
         workspace = await session.get(Workspace, ctx.id)
         if workspace is None:
@@ -69,15 +75,17 @@ async def _events(
             if conversation is None:
                 yield ChatEvent.failure(NotFoundError("Conversation not found."))
                 return
+        answer = ChatService(container, session).ask(
+            workspace,
+            ctx.principal,
+            body.question,
+            conversation=conversation,
+            document_ids=body.document_ids,
+        )
         try:
-            async for event in ChatService(container, session).ask(
-                workspace,
-                ctx.principal,
-                body.question,
-                conversation=conversation,
-                document_ids=body.document_ids,
-            ):
-                yield event
+            async with aclosing(answer):
+                async for event in answer:
+                    yield event
         except AppError as exc:
             yield ChatEvent.failure(exc)
         except Exception:
@@ -85,21 +93,20 @@ async def _events(
             yield ChatEvent.failure(InternalError())
 
 
-async def _collect(events: AsyncIterator[ChatEvent]) -> AnswerOut:
-    async for event in events:
-        if event.event == "error":
-            raise event.error or UpstreamError()
-        if event.event == "done":
-            return AnswerOut.model_validate(event.data)
+async def _collect(events: AsyncGenerator[ChatEvent]) -> AnswerOut:
+    async with aclosing(events):
+        async for event in events:
+            if event.event == "error":
+                raise event.error or UpstreamError()
+            if event.event == "done":
+                return AnswerOut.model_validate(event.data)
     raise UpstreamError("The answer did not complete.")
 
 
-def _sse(events: AsyncIterator[ChatEvent]) -> AsyncIterator[ServerSentEvent]:
-    async def stream() -> AsyncIterator[ServerSentEvent]:
+async def _sse(events: AsyncGenerator[ChatEvent]) -> AsyncGenerator[ServerSentEvent]:
+    async with aclosing(events):
         async for event in events:
             yield ServerSentEvent(event=event.event, data=event.data)
-
-    return stream()
 
 
 @router.get("/conversations", summary="Your conversations in this workspace")
@@ -198,8 +205,9 @@ async def ask_in_conversation_stream(
     session: SessionDep,
 ) -> AsyncIterator[ServerSentEvent]:
     await ChatService(container, session).get_conversation(ctx.id, conversation_id, ctx.principal)
-    async for event in _sse(_events(container, ctx, body, conversation_id)):
-        yield event
+    async with aclosing(_sse(_events(container, ctx, body, conversation_id))) as stream:
+        async for event in stream:
+            yield event
 
 
 @router.post(
@@ -218,5 +226,6 @@ async def ask(body: AskRequest, ctx: ViewerDep, container: ContainerDep) -> Answ
 async def ask_stream(
     body: AskRequest, ctx: ViewerDep, container: ContainerDep
 ) -> AsyncIterator[ServerSentEvent]:
-    async for event in _sse(_events(container, ctx, body, None)):
-        yield event
+    async with aclosing(_sse(_events(container, ctx, body, None))) as stream:
+        async for event in stream:
+            yield event
