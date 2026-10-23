@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict
 from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
@@ -61,7 +62,7 @@ class InsightsService:
         payload: dict[str, Any] = {
             "days": days,
             "totals": {
-                **totals.__dict__,
+                **asdict(totals),
                 "saved_ratio": round(totals.saved_tokens / totals.baseline_tokens, 4)
                 if totals.baseline_tokens
                 else 0.0,
