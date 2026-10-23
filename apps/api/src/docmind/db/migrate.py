@@ -10,11 +10,12 @@ from pathlib import Path
 
 from alembic import command
 from alembic.config import Config
-from sqlalchemy import pool, text
+from sqlalchemy import text
 from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import create_async_engine
 
 import docmind
+from docmind.core.config import Settings
+from docmind.db.session import create_engine
 
 # Arbitrary, stable 64-bit key: "docmind" in ASCII.
 MIGRATION_LOCK_KEY = 0x646F636D696E64
@@ -32,8 +33,10 @@ def _upgrade(connection: Connection, revision: str) -> None:
     command.upgrade(config, revision)
 
 
-async def migrate(database_url: str, revision: str = "head") -> None:
-    engine = create_async_engine(database_url, poolclass=pool.NullPool)
+async def migrate(settings: Settings, revision: str = "head") -> None:
+    # No vector codec here: on a fresh database the vector type does not exist until the
+    # first migration creates the extension.
+    engine = create_engine(settings, pooled=False, vector_codec=False)
     try:
         async with engine.begin() as conn:
             await conn.execute(

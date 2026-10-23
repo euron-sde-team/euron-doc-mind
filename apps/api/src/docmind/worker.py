@@ -110,7 +110,7 @@ async def main() -> None:
     settings = get_settings()
     configure_logging(settings.log_level, settings.log_format)
     if settings.migrate_on_boot:
-        await migrate(settings.database_url)
+        await migrate(settings)
     container = build_container(settings)
     if not isinstance(container.queue, SqsQueue):
         raise SystemExit(
