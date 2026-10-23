@@ -4,6 +4,7 @@ import uuid
 from dataclasses import dataclass
 
 from sqlalchemy import func, select, update
+from sqlalchemy.orm import aliased
 
 from docmind.models import Document, Membership, User, Workspace
 from docmind.models.enums import DocumentStatus, Role
@@ -41,10 +42,18 @@ class WorkspaceRepository(Repository):
         documents = (
             select(func.count())
             .where(Document.workspace_id == Workspace.id, Document.status == DocumentStatus.READY)
+            .correlate(Workspace)
             .scalar_subquery()
         )
+        # The outer query joins memberships too; counting through an alias keeps the
+        # subquery from correlating to the caller's own membership row.
+        everyone = aliased(Membership)
         members = (
-            select(func.count()).where(Membership.workspace_id == Workspace.id).scalar_subquery()
+            select(func.count())
+            .select_from(everyone)
+            .where(everyone.workspace_id == Workspace.id)
+            .correlate(Workspace)
+            .scalar_subquery()
         )
         result = await self.session.execute(
             select(Workspace, Membership.role, documents, members)
