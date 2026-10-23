@@ -20,6 +20,7 @@ resource "random_password" "auth" {
 }
 
 resource "aws_elasticache_replication_group" "this" {
+  #checkov:skip=CKV2_AWS_50:Failover needs a replica. aws-prod runs one (cache_replicas = 1), which turns on automatic failover and Multi-AZ below; aws-dev keeps a single node to save cost.
   replication_group_id       = "${var.name_prefix}-cache"
   description                = "Answer and embedding caches, rate limits and revoked sessions"
   engine                     = "valkey"
