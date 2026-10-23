@@ -14,6 +14,9 @@ from docmind.ai.sources import Source
 from docmind.core.text import content_terms, split_sentences, truncate
 
 _MARKER = re.compile(r"\s?\[(\d{1,2}(?:\s*[,;]\s*\d{1,2})*)\]")
+# Blocks (paragraphs, list items) come before sentences: list items rarely end with a full
+# stop, so splitting a slide or a list by sentence alone would quote the whole list.
+_BLOCK = re.compile(r"\n\s*\n|\n(?=\s*[\N{BULLET}*-]\s)")
 
 
 def _numbers(group: str) -> list[int]:
@@ -22,9 +25,9 @@ def _numbers(group: str) -> list[int]:
 
 def best_quote(claim: str, passage: str) -> str:
     claim_terms = set(content_terms(claim))
-    sentences = split_sentences(passage) or [passage]
-    best = max(sentences, key=lambda s: len(claim_terms & set(content_terms(s))))
-    return truncate(best, 320)
+    pieces = [sentence for block in _BLOCK.split(passage) for sentence in split_sentences(block)]
+    best = max(pieces or [passage], key=lambda s: len(claim_terms & set(content_terms(s))))
+    return truncate(" ".join(best.lstrip("\N{BULLET}*- ").split()), 320)
 
 
 def extract_citations(answer: str, sources: list[Source]) -> tuple[str, list[dict[str, Any]]]:
